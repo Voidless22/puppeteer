@@ -87,13 +87,48 @@ end
 local function drawGlobalDashboardScreen()
 
 end
-local function drawBotDetailsSubscreen()
+
+
+
+local function drawIconGrid(iconTable)
+    local iconPadding = 4
+    local iconSize = 48
+    local windowWidth = ImGui.GetWindowSizeVec().x
+    local columnCount = math.floor(windowWidth / (iconSize + iconPadding))
+    local currentColumn = 1
+    local currentRow = 1
+    for index, value in pairs(iconTable) do
+        if currentColumn < columnCount then
+            local prevX = ImGui.GetCursorPosX()
+            local prevY = ImGui.GetCursorPosY()
+            local raceTexture = mq.FindTextureAnimation(value .. 'Icon')
+            ImGui.DrawTextureAnimation(raceTexture, iconSize, iconSize)
+           -- ImGui.SetCursorPosX(prevX + (iconSize + iconPadding))
+            --ImGui.SetCursorPosY(prevY)
+            ImGui.SameLine(0, iconPadding)
+            currentColumn = currentColumn + 1
+        elseif currentColumn >= columnCount then
+            local prevY = ImGui.GetCursorPosY()
+            local raceTexture = mq.FindTextureAnimation(value .. 'Icon')
+            ImGui.DrawTextureAnimation(raceTexture, iconSize, iconSize)
+            ImGui.NewLine()
+            ImGui.SetCursorPosY(prevY + (iconSize + iconPadding))
+            currentRow = currentRow + 1
+            currentColumn = 1
+        end
+    end
 end
+
 
 local function drawCreateBotSubscreen()
     ImGui.SetCursorPosX(16)
-    if ImGui.BeginChild("CreateBot", ImVec2(480, 512), ImGuiChildFlags.Border, ImGuiWindowFlags.AlwaysVerticalScrollbar) then
-        utils.CenterText("Create Bot Screen")
+    if ImGui.BeginChild("CreateBot", ImVec2(480, 512), ImGuiChildFlags.Border) then
+        utils.CenterText("Create A Bot")
+        ImGui.SeparatorText("Races")
+        drawIconGrid(utils.Races)
+        ImGui.NewLine()
+        ImGui.SeparatorText("Classes")
+        drawIconGrid(utils.Classes)
 
         ImGui.EndChild()
     end
@@ -102,7 +137,9 @@ end
 local function drawDeleteBotSubscreen()
 end
 
-local function drawBotDetailSubscreen()
+local function drawBotDetailsSubscreen()
+    local raceTexture = mq.FindTextureAnimation(data.CharacterBots[selectedBotIndex].Race .. 'Icon')
+    ImGui.DrawTextureAnimation(raceTexture, 48, 48)
 end
 
 function gui.SetActiveScreen(screenName)

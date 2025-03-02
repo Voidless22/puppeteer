@@ -11,7 +11,7 @@ function data.SetBotData(key, botData)
         printf("Nill bot data")
     else
         print(botData.Name)
-        data.CharacterBots[key] = botData
+        data.CharacterBots[tonumber(key)] = botData
         data.BotNameList[tonumber(key)] = botData.Name
     end
 end
