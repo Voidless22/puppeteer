@@ -32,6 +32,25 @@ utils.RaceClassCombinations = {
 }
 
 
+utils.ClassTextures = {
+    Bard = mq.FindTextureAnimation("BardIcon"),
+    Beastlord = mq.FindTextureAnimation("BeastlordIcon"),
+    Berserker = mq.FindTextureAnimation("BerserkerIcon"),
+    Cleric = mq.FindTextureAnimation("ClericIcon"),
+    Druid = mq.FindTextureAnimation("DruidIcon"),
+    Enchanter = mq.FindTextureAnimation("EnchanterIcon"),
+    Magician = mq.FindTextureAnimation("MagicianIcon"),
+    Monk = mq.FindTextureAnimation("MonkIcon"),
+    Necromancer = mq.FindTextureAnimation("NecromancerIcon"),
+    Paladin = mq.FindTextureAnimation("PaladinIcon"),
+    Ranger = mq.FindTextureAnimation("RangerIcon"),
+    Rogue = mq.FindTextureAnimation("RogueIcon"),
+    ShadowKnight = mq.FindTextureAnimation("Shadow KnightIcon"),
+    Shaman = mq.FindTextureAnimation("ShamanIcon"),
+    Warrior = mq.FindTextureAnimation("WarriorIcon"),
+    Wizard = mq.FindTextureAnimation("WizardIcon")
+}
+
 utils.RaceTextures = {
     -- Female Icons
     FBarbarian = mq.FindTextureAnimation("BarbarianIcon"),

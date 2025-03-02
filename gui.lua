@@ -150,7 +150,7 @@ local function drawClassGrid()
     for index, value in ipairs(utils.Classes) do
         local prevCursorPos = ImGui.GetCursorPosVec()
         local prevScreenCursorPos = ImGui.GetCursorScreenPosVec()
-        local classTexture = mq.FindTextureAnimation(value .. 'Icon')
+        local classTexture = utils.ClassTextures[value:gsub("%s+", "")]
         ImGui.DrawTextureAnimation(classTexture, ClassRaceIconSize, ClassRaceIconSize)
         ImGui.SetCursorPos(prevCursorPos)
         if utils.IsValidRaceClassCombo(botCreateSelectedRace, value) then
