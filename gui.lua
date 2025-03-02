@@ -13,6 +13,7 @@ local selectBotComboWidth = 350
 local botCreateSelectedRace = ''
 local botCreateSelectedClass = ''
 local botCreateSelectedGender = 1
+local createBotName = ''
 
 function gui.createBotButton()
     selectedBotIndex = 0
@@ -196,6 +197,28 @@ local function drawGenderSelectSection()
     botCreateSelectedGender = ImGui.RadioButton("Female", botCreateSelectedGender, 2)
 end
 
+local function drawNameAndDetailsSection()
+    local firstCursorPos = ImGui.GetCursorPosVec()
+    local CenterY = (ImGui.GetWindowSizeVec().y - ImGui.GetCursorPosY()) / 2
+    local CenterX = (ImGui.GetWindowSizeVec().x - ImGui.GetCursorPosX()) / 2
+    ImGui.SetCursorPosY((ImGui.GetCursorPosY() + CenterY) - 16)
+    ImGui.SetNextItemWidth(CenterX)
+    createBotName = ImGui.InputTextWithHint("##BotName", "Enter a Bot Name...", createBotName)
+    ImGui.SetCursorPos(ImVec2(CenterX + 16, firstCursorPos.y))
+    ImGui.Text("Bot Name: %s", createBotName)
+    ImGui.SetCursorPosX(CenterX + 16)
+    ImGui.Text("Race: %s", botCreateSelectedRace)
+    ImGui.SetCursorPosX(CenterX + 16)
+    ImGui.Text("Class: %s", botCreateSelectedClass)
+    ImGui.SetCursorPosX(CenterX + 16)
+    if botCreateSelectedGender == 1 then
+        ImGui.Text("Gender/Sex: Male")
+    elseif botCreateSelectedGender == 2 then
+        ImGui.Text("Gender/Sex: Female")
+    end
+    ImGui.SetCursorPosX(CenterX + 16)
+    ImGui.Button("Create Bot", ImVec2(96,32))
+end
 
 local function drawCreateBotSubscreen()
     ImGui.SetCursorPosX(16)
@@ -209,6 +232,9 @@ local function drawCreateBotSubscreen()
         ImGui.NewLine()
         ImGui.SeparatorText("Gender/Sex")
         drawGenderSelectSection()
+        ImGui.NewLine()
+        ImGui.SeparatorText("Name and Details")
+        drawNameAndDetailsSection()
         ImGui.EndChild()
     end
 end
