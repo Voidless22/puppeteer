@@ -5,20 +5,24 @@ local utils = require('utils')
 local gui   = {}
 
 
-local function drawBotInfo()
-end
-local function createBotButton()
 
-end
-local function deleteBotButton()
+local openPuppeteer, showPuppeteer = true, true
+local selectedBotIndex = 0
+local selectBotComboWidth = 350
+
+function gui.createBotButton()
+    selectedBotIndex = 0
+    gui.SetActiveSubscreen("CreateBot")
 end
 
+function gui.deleteBotButton()
+    selectedBotIndex = 0
+    gui.SetActiveScreen("DeleteBot")
+end
 
-gui.buttonStates = {
-    refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
-    createBot = { activated = false, guiButton = true, callback = createBotButton },
-    deleteBot = { activated = false, guiButton = false, callback = deleteBotButton },
-}
+function gui.botManagementButton()
+    gui.SetActiveScreen("BotManagement")
+end
 
 function gui.GetButtonState(button)
     if button ~= nil then
@@ -40,15 +44,23 @@ function gui.SetButtonState(button, state)
     gui.buttonStates[button].activated = state
 end
 
-local openPuppeteer, showPuppeteer = true, true
-local showWelcomeScreen = true
-local selectedBotIndex = 0
-local selectBotComboWidth = 350
-
-
+function gui.backToWelcomeButton()
+    selectedBotIndex = 0
+    gui.SetActiveScreen("Welcome")
+end
 
 local function drawWelcomeScreen()
     utils.CenterText("Welcome to Puppeteer.")
+    local buttonWidth = 256
+    ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - buttonWidth)
+    if ImGui.Button("Bot Management", ImVec2(buttonWidth, 24)) then gui.buttonStates.botManagement.activated = true end
+    ImGui.SameLine()
+    if ImGui.Button("Global Dashboard", ImVec2(buttonWidth, 24)) then gui.buttonStates.GlobalDashboard.activated = true end
+end
+
+local function drawBotManagementScreen()
+    if ImGui.Button("<", ImVec2(32, 32)) then gui.buttonStates.backToWelcome.activated = true end
+    ImGui.SameLine()
     utils.CenterText("Select or Create a Bot...")
     ImGui.PushItemWidth(selectBotComboWidth)
     utils.CenterItem()
@@ -66,9 +78,128 @@ local function drawWelcomeScreen()
     if ImGui.Button("Refresh Bot List", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.refreshBotList.activated = true end
     ImGui.SameLine()
     if ImGui.Button("Delete a Bot", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.deleteBot.activated = true end
-
+    --and not gui.Subscreens.DeleteBot.showDeleteBotSubscreen
     if selectedBotIndex ~= 0 then
-        drawBotInfo()
+        gui.SetActiveSubscreen("BotDetails")
+    end
+end
+
+local function drawGlobalDashboardScreen()
+
+end
+local function drawBotDetailsSubscreen()
+end
+
+local function drawCreateBotSubscreen()
+    ImGui.SetCursorPosX(16)
+    if ImGui.BeginChild("CreateBot", ImVec2(480, 512), ImGuiChildFlags.Border, ImGuiWindowFlags.AlwaysVerticalScrollbar) then
+        utils.CenterText("Create Bot Screen")
+
+        ImGui.EndChild()
+    end
+end
+
+local function drawDeleteBotSubscreen()
+end
+
+local function drawBotDetailSubscreen()
+end
+
+function gui.SetActiveScreen(screenName)
+    -- Only one screen should be active, so starting by disabling all of them.
+    for name, screen in pairs(gui.Screens) do
+        for key, value in pairs(screen) do
+            if type(value) == "boolean" and key:match("^show") then
+                screen[key] = false
+            end
+        end
+    end
+
+    -- Now let's enable the screen we want.
+    local selectedScreen = gui.Screens[screenName]
+    if selectedScreen then
+        for key in pairs(selectedScreen) do
+            if key:match("^show") then
+                selectedScreen[key] = true
+                break
+            end
+        end
+    else
+        printf("Missing Screen: %s", screenName)
+    end
+
+    -- now we need to make sure all the subscreens are disabled.
+    gui.SetActiveSubscreen(nil)
+end
+
+function gui.SetActiveSubscreen(subscreenName)
+    -- same deal as screens, clear the slate and disable all of them.
+    for name, subscreen in pairs(gui.Subscreens) do
+        for key, value in pairs(subscreen) do
+            if type(value) == "boolean" and key:match("^show") then
+                subscreen[key] = false
+            end
+        end
+    end
+    -- now let's make sure this subscreen exists and matches it's parent
+    if subscreenName then
+        local selectedSubscreen = gui.Subscreens[subscreenName]
+        if selectedSubscreen then
+            local parentScreen = selectedSubscreen.parent
+            if gui.Screens[parentScreen] and gui.Screens[parentScreen]["show" .. parentScreen .. "Screen"] then
+                -- Activate subscreen only if its parent screen is active
+                for key in pairs(selectedSubscreen) do
+                    if key:match("^show") then
+                        selectedSubscreen[key] = true
+                        break
+                    end
+                end
+            else
+                print("Error: Parent Screen does not match subscreen parent.")
+            end
+        else
+            printf("Missing Subscreen: %s", subscreenName)
+        end
+    end
+end
+
+function gui.ScreenManager()
+    -- Find and draw the active screen
+    for name, screen in pairs(gui.Screens) do
+        for key, value in pairs(screen) do
+            if type(value) == "boolean" and value and key:match("^show") then
+                if screen.drawFunction then
+                    screen.drawFunction()
+                end
+                break -- Only one active screen at a time
+            end
+        end
+    end
+
+    -- Find and draw the active subscreen (only if its parent screen is active)
+    for name, subscreen in pairs(gui.Subscreens) do
+        local parentScreen = subscreen.parent
+        if gui.Screens[parentScreen] and gui.Screens[parentScreen]["show" .. parentScreen .. "Screen"] then
+            for key, value in pairs(subscreen) do
+                if type(value) == "boolean" and value and key:match("^show") then
+                    if subscreen.drawFunction then
+                        subscreen.drawFunction()
+                    end
+                    break -- Only one active subscreen at a time
+                end
+            end
+        end
+    end
+end
+
+function gui.ButtonStateManager()
+    for index, value in pairs(gui.GetButtonState()) do
+        if value ~= nil then
+            if value.activated and value.guiButton then
+                value.callback()
+                gui.buttonStates[index].activated = false
+            end
+        end
     end
 end
 
@@ -76,21 +207,33 @@ function gui.guiLoop()
     showPuppeteer, openPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
     if showPuppeteer then
         ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
-        if showWelcomeScreen then
-            drawWelcomeScreen()
-        end
-        ImGui.Separator()
 
-        for index, value in pairs(gui.GetButtonState()) do
-            if value ~= nil then
-                if value.activated and value.guiButton then
-                    value.callback()
-                    gui.buttonStates[index].activated = false
-                end
-            end
-        end
+        gui.ScreenManager()
+
+        gui.ButtonStateManager()
     end
     ImGui.End()
 end
+
+gui.Screens = {
+    Welcome = { showWelcomeScreen = true, drawFunction = drawWelcomeScreen },
+    BotManagement = { showBotManagementScreen = false, drawFunction = drawBotManagementScreen },
+    GlobalDashboard = { showGlobalDashboardScreen = false, drawFunction = drawGlobalDashboardScreen }
+}
+gui.Subscreens = {
+    CreateBot = { parent = "BotManagement", showCreateBotSubscreen = false, drawFunction = drawCreateBotSubscreen },
+    DeleteBot = { parent = "BotManagement", showDeleteBotSubscreen = false, drawFunction = drawDeleteBotSubscreen },
+    BotDetails = { parent = "BotManagement", showBotDetailsSubscreen = false, drawFunction = drawBotDetailsSubscreen },
+}
+
+gui.buttonStates = {
+    backToWelcome = { activate = false, guiButton = true, callback = gui.backToWelcomeButton },
+    botManagement = { activate = false, guiButton = true, callback = gui.botManagementButton },
+    refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
+    createBot = { activated = false, guiButton = true, callback = gui.createBotButton },
+    deleteBot = { activated = false, guiButton = false, callback = gui.deleteBotButton },
+}
+
+
 
 return gui
