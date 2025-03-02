@@ -31,6 +31,45 @@ utils.RaceClassCombinations = {
     ["Wood Elf"] = { "Bard", "Beastlord", "Druid", "Ranger", "Rogue", "Warrior" }
 }
 
+
+utils.RaceTextures = {
+    -- Female Icons
+    FBarbarian = mq.FindTextureAnimation("BarbarianIcon"),
+    FDarkElf = mq.FindTextureAnimation("Dark ElfIcon"),
+    FDrakkin = mq.FindTextureAnimation("DrakkinIcon"),
+    FDwarf = mq.FindTextureAnimation("DwarfIcon"),
+    FErudite = mq.FindTextureAnimation("EruditeIcon"),
+    FFroglok = mq.FindTextureAnimation("FroglokIcon"),
+    FGnome = mq.FindTextureAnimation("GnomeIcon"),
+    FHalfElf = mq.FindTextureAnimation("Half ElfIcon"),
+    FHalfling = mq.FindTextureAnimation("HalflingIcon"),
+    FHighElf = mq.FindTextureAnimation("High ElfIcon"),
+    FHuman = mq.FindTextureAnimation("HumanIcon"),
+    FIksar = mq.FindTextureAnimation("IksarIcon"),
+    FOgre = mq.FindTextureAnimation("OgreIcon"),
+    FTroll = mq.FindTextureAnimation("TrollIcon"),
+    FVahShir = mq.FindTextureAnimation("Vah ShirIcon"),
+    FWoodElf = mq.FindTextureAnimation("Wood ElfIcon"),
+    -- Male Icons
+    MBarbarian = mq.FindTextureAnimation("BarbarianMaleIcon"),
+    MDarkElf = mq.FindTextureAnimation("Dark ElfMaleIcon"),
+    MDrakkin = mq.FindTextureAnimation("DrakkinMaleIcon"),
+    MDwarf = mq.FindTextureAnimation("DwarfMaleIcon"),
+    MErudite = mq.FindTextureAnimation("EruditeMaleIcon"),
+    MFroglok = mq.FindTextureAnimation("FroglokMaleIcon"),
+    MGnome = mq.FindTextureAnimation("GnomeMaleIcon"),
+    MHalfElf = mq.FindTextureAnimation("Half ElfMaleIcon"),
+    MHalfling = mq.FindTextureAnimation("HalflingMaleIcon"),
+    MHighElf = mq.FindTextureAnimation("High ElfMaleIcon"),
+    MHuman = mq.FindTextureAnimation("HumanMaleIcon"),
+    MIksar = mq.FindTextureAnimation("IksarMaleIcon"),
+    MOgre = mq.FindTextureAnimation("OgreMaleIcon"),
+    MTroll = mq.FindTextureAnimation("TrollMaleIcon"),
+    MVahShir = mq.FindTextureAnimation("Vah ShirMaleIcon"),
+    MWoodElf = mq.FindTextureAnimation("Wood ElfMaleIcon")
+}
+
+
 function utils.IsValidRaceClassCombo(race, class)
     if race == '' then return false end
     for index, value in ipairs(utils.RaceClassCombinations[race]) do
