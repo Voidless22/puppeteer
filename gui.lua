@@ -10,6 +10,9 @@ local openPuppeteer, showPuppeteer = true, true
 local selectedBotIndex = 0
 local selectBotComboWidth = 350
 
+local botCreateSelectedRace = ''
+local botCreateSelectedClass = ''
+
 function gui.createBotButton()
     selectedBotIndex = 0
     gui.SetActiveSubscreen("CreateBot")
@@ -90,27 +93,126 @@ end
 
 
 
-local function drawIconGrid(iconTable)
+local function drawRaceGrid()
+    local drawlist = ImGui.GetWindowDrawList()
+
     local iconPadding = 4
     local iconSize = 48
     local windowWidth = ImGui.GetWindowSizeVec().x
     local columnCount = math.floor(windowWidth / (iconSize + iconPadding))
     local currentColumn = 1
     local currentRow = 1
-    for index, value in pairs(iconTable) do
+    for index, value in ipairs(utils.Races) do
+        local prevCursorPos = ImGui.GetCursorPosVec()
+
         if currentColumn < columnCount then
-            local prevX = ImGui.GetCursorPosX()
-            local prevY = ImGui.GetCursorPosY()
             local raceTexture = mq.FindTextureAnimation(value .. 'Icon')
             ImGui.DrawTextureAnimation(raceTexture, iconSize, iconSize)
-           -- ImGui.SetCursorPosX(prevX + (iconSize + iconPadding))
-            --ImGui.SetCursorPosY(prevY)
+            ImGui.SetCursorPos(prevCursorPos)
+            local prevScreenCursorPos = ImGui.GetCursorScreenPosVec()
+            if ImGui.InvisibleButton("##RaceBtn" .. index, ImVec2(iconSize, iconSize)) then
+                printf("Button: %s Selected", value)
+                botCreateSelectedRace = value
+                botCreateSelectedClass = ''
+            end
+            if botCreateSelectedRace == value then
+                ImGui.SetCursorPos(prevCursorPos)
+                ImGui.SetCursorScreenPos(prevScreenCursorPos)
+                local x = prevScreenCursorPos.x + iconSize
+                local y = prevScreenCursorPos.y + iconSize
+                local color = ImGui.GetColorU32(0, 1, 0, 0.25)
+                drawlist:AddRectFilled(prevScreenCursorPos, ImVec2(x, y), color)
+            end
+
             ImGui.SameLine(0, iconPadding)
             currentColumn = currentColumn + 1
         elseif currentColumn >= columnCount then
             local prevY = ImGui.GetCursorPosY()
             local raceTexture = mq.FindTextureAnimation(value .. 'Icon')
             ImGui.DrawTextureAnimation(raceTexture, iconSize, iconSize)
+            ImGui.SetCursorPos(prevCursorPos)
+            local prevScreenCursorPos = ImGui.GetCursorScreenPosVec()
+            if ImGui.InvisibleButton("##RaceBtn" .. index, ImVec2(iconSize, iconSize)) then
+                printf("Button: %s Selected", value)
+                botCreateSelectedRace = value
+                botCreateSelectedClass = ''
+            end
+            if botCreateSelectedRace == value then
+                ImGui.SetCursorPos(prevCursorPos)
+                ImGui.SetCursorScreenPos(prevScreenCursorPos)
+                local x = prevScreenCursorPos.x + iconSize
+                local y = prevScreenCursorPos.y + iconSize
+                local color = ImGui.GetColorU32(0, 1, 0, 0.25)
+                drawlist:AddRectFilled(prevScreenCursorPos, ImVec2(x, y), color)
+            end
+            ImGui.NewLine()
+            ImGui.SetCursorPosY(prevY + (iconSize + iconPadding))
+            currentRow = currentRow + 1
+            currentColumn = 1
+        end
+    end
+end
+local function drawClassGrid()
+    local drawlist = ImGui.GetWindowDrawList()
+    local iconPadding = 4
+    local iconSize = 48
+    local windowWidth = ImGui.GetWindowSizeVec().x
+    local columnCount = math.floor(windowWidth / (iconSize + iconPadding))
+    local currentColumn = 1
+    local currentRow = 1
+    for index, value in ipairs(utils.Classes) do
+        if currentColumn < columnCount then
+            local prevCursorPos = ImGui.GetCursorPosVec()
+            local prevScreenCursorPos = ImGui.GetCursorScreenPosVec()
+            local raceTexture = mq.FindTextureAnimation(value .. 'Icon')
+            ImGui.DrawTextureAnimation(raceTexture, iconSize, iconSize)
+
+            if utils.IsValidRaceClassCombo(botCreateSelectedRace, value) then
+                ImGui.SetCursorPos(prevCursorPos)
+                ImGui.SetCursorScreenPos(prevScreenCursorPos)
+                if ImGui.InvisibleButton("##ClassBtn" .. index, ImVec2(iconSize, iconSize)) then
+                    printf("Button: %s Selected", value)
+                    botCreateSelectedClass = value
+                end
+            else
+                ImGui.SetCursorPos(prevCursorPos)
+                ImGui.SetCursorScreenPos(prevScreenCursorPos)
+                local x = prevScreenCursorPos.x + iconSize
+                local y = prevScreenCursorPos.y + iconSize
+                local color = ImGui.GetColorU32(1, 0, 0, 0.25)
+                drawlist:AddRectFilled(prevScreenCursorPos, ImVec2(x, y), color)
+            end
+
+            if botCreateSelectedClass == value then
+                ImGui.SetCursorPos(prevCursorPos)
+                ImGui.SetCursorScreenPos(prevScreenCursorPos)
+                local x = prevScreenCursorPos.x + iconSize
+                local y = prevScreenCursorPos.y + iconSize
+                local color = ImGui.GetColorU32(0, 1, 0, 0.25)
+                drawlist:AddRectFilled(prevScreenCursorPos, ImVec2(x, y), color)
+            end
+            ImGui.SameLine(0, iconPadding)
+            currentColumn = currentColumn + 1
+        elseif currentColumn >= columnCount then
+            local prevCursorPos = ImGui.GetCursorPosVec()
+            local prevScreenCursorPos = ImGui.GetCursorScreenPosVec()
+            local prevY = ImGui.GetCursorPosY()
+            local raceTexture = mq.FindTextureAnimation(value .. 'Icon')
+            ImGui.DrawTextureAnimation(raceTexture, iconSize, iconSize)
+
+            if utils.IsValidRaceClassCombo(botCreateSelectedRace, value) then
+                ImGui.SetCursorPos(prevCursorPos)
+                if ImGui.InvisibleButton("##IconBtn" .. index, ImVec2(iconSize, iconSize)) then
+                    printf("Button: %s Selected", value)
+                end
+            else
+                ImGui.SetCursorPos(prevCursorPos)
+                ImGui.SetCursorScreenPos(prevScreenCursorPos)
+                local x = prevScreenCursorPos.x + iconSize
+                local y = prevScreenCursorPos.y + iconSize
+                local color = ImGui.GetColorU32(1, 0, 0, 0.25)
+                drawlist:AddRectFilled(prevScreenCursorPos, ImVec2(x, y), color)
+            end
             ImGui.NewLine()
             ImGui.SetCursorPosY(prevY + (iconSize + iconPadding))
             currentRow = currentRow + 1
@@ -119,16 +221,15 @@ local function drawIconGrid(iconTable)
     end
 end
 
-
 local function drawCreateBotSubscreen()
     ImGui.SetCursorPosX(16)
     if ImGui.BeginChild("CreateBot", ImVec2(480, 512), ImGuiChildFlags.Border) then
         utils.CenterText("Create A Bot")
         ImGui.SeparatorText("Races")
-        drawIconGrid(utils.Races)
+        drawRaceGrid()
         ImGui.NewLine()
         ImGui.SeparatorText("Classes")
-        drawIconGrid(utils.Classes)
+        drawClassGrid()
 
         ImGui.EndChild()
     end
