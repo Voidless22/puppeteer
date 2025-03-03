@@ -1,31 +1,15 @@
-local mq    = require('mq')
-local imgui = require('ImGui')
-local data  = require('data')
-local utils = require('utils')
+local mq                 = require('mq')
+local imgui              = require('ImGui')
+local data               = require('data')
+local utils              = require('utils')
 local createBotSubscreen = require('screens/createBotSubscreen')
-local gui   = {}
+local gui                = {}
 
 
 
 local openPuppeteer, showPuppeteer = true, true
 local selectedBotIndex = 0
 local selectBotComboWidth = 350
-
-
-
-function gui.createBotButton()
-    selectedBotIndex = 0
-    gui.SetActiveSubscreen("CreateBot")
-end
-
-function gui.deleteBotButton()
-    selectedBotIndex = 0
-    gui.SetActiveScreen("DeleteBot")
-end
-
-function gui.botManagementButton()
-    gui.SetActiveScreen("BotManagement")
-end
 
 function gui.GetButtonState(button)
     if button ~= nil then
@@ -47,22 +31,25 @@ function gui.SetButtonState(button, state)
     gui.buttonStates[button].activated = state
 end
 
-function gui.backToWelcomeButton()
-    selectedBotIndex = 0
-    gui.SetActiveScreen("Welcome")
-end
-
 local function drawWelcomeScreen()
     utils.CenterText("Welcome to Puppeteer.")
     local buttonWidth = 256
     ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - buttonWidth)
-    if ImGui.Button("Bot Management", ImVec2(buttonWidth, 24)) then gui.buttonStates.botManagement.activated = true end
+    if ImGui.Button("Bot Management", ImVec2(buttonWidth, 24)) then
+        gui.SetActiveScreen("BotManagement")
+    end
     ImGui.SameLine()
-    if ImGui.Button("Global Dashboard", ImVec2(buttonWidth, 24)) then gui.buttonStates.GlobalDashboard.activated = true end
+    if ImGui.Button("Global Dashboard", ImVec2(buttonWidth, 24)) then
+        selectedBotIndex = 0
+        gui.SetActiveScreen("GlobalDashboard")
+    end
 end
 
 local function drawBotManagementScreen()
-    if ImGui.Button("<", ImVec2(32, 32)) then gui.buttonStates.backToWelcome.activated = true end
+    if ImGui.Button("<", ImVec2(32, 32)) then
+        selectedBotIndex = 0
+        gui.SetActiveScreen("Welcome")
+    end
     ImGui.SameLine()
     utils.CenterText("Select or Create a Bot...")
     ImGui.PushItemWidth(selectBotComboWidth)
@@ -76,11 +63,17 @@ local function drawBotManagementScreen()
     local buttonWidth = (selectBotComboWidth / 3) - buttonPadding
 
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
-    if ImGui.Button("Create a Bot", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.createBot.activated = true end
+    if ImGui.Button("Create a Bot", ImVec2(buttonWidth, buttonSizeY)) then
+        selectedBotIndex = 0
+        gui.SetActiveSubscreen("CreateBot")
+    end
     ImGui.SameLine()
     if ImGui.Button("Refresh Bot List", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.refreshBotList.activated = true end
     ImGui.SameLine()
-    if ImGui.Button("Delete a Bot", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.deleteBot.activated = true end
+    if ImGui.Button("Delete a Bot", ImVec2(buttonWidth, buttonSizeY)) then
+        selectedBotIndex = 0
+        gui.SetActiveScreen("DeleteBot")
+    end
     if selectedBotIndex ~= 0 then
         gui.SetActiveSubscreen("BotDetails")
     end
@@ -221,12 +214,9 @@ gui.Subscreens = {
 }
 
 gui.buttonStates = {
-    backToWelcome = { activate = false, guiButton = true, callback = gui.backToWelcomeButton },
-    botManagement = { activate = false, guiButton = true, callback = gui.botManagementButton },
     refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
-    createBot = { activated = false, guiButton = true, callback = gui.createBotButton },
-    deleteBot = { activated = false, guiButton = false, callback = gui.deleteBotButton },
 }
+
 
 
 
