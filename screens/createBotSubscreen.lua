@@ -1,12 +1,16 @@
 local mq = require('mq')
 local imgui = require('ImGui')
 local utils = require('utils')
+local events= require('events')
 local createBotSubscreen = {}
 
 local botCreateSelectedRace = ''
 local botCreateSelectedClass = ''
 local botCreateSelectedGender = 1
 local createBotName = ''
+local createBotTitle = ''
+local createBotLastName = ''
+local createBotSuffix = ''
 local ClassRaceIconPadding = 4
 local ClassRaceIconSize = 48
 local function drawRaceGrid()
@@ -107,13 +111,24 @@ local function drawGenderSelectSection()
     ImGui.SameLine()
     botCreateSelectedGender = ImGui.RadioButton("Female", botCreateSelectedGender, 2)
 end
+
 local function drawNameAndDetailsSection()
+    local textInputPadding = 16
     local firstCursorPos = ImGui.GetCursorPosVec()
-    local CenterY = (ImGui.GetWindowSizeVec().y - ImGui.GetCursorPosY()) / 2
+    local quarterY = (ImGui.GetWindowSizeVec().y - ImGui.GetCursorPosY()) / 4
     local CenterX = (ImGui.GetWindowSizeVec().x - ImGui.GetCursorPosX()) / 2
-    ImGui.SetCursorPosY((ImGui.GetCursorPosY() + CenterY) - 16)
+    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + textInputPadding)
+    ImGui.SetNextItemWidth(CenterX)
+    createBotTitle = ImGui.InputTextWithHint("##BotTitle", "Enter a Bot Title (Optional)...", createBotTitle)
+    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + textInputPadding)
     ImGui.SetNextItemWidth(CenterX)
     createBotName = ImGui.InputTextWithHint("##BotName", "Enter a Bot Name...", createBotName)
+    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + textInputPadding)
+    ImGui.SetNextItemWidth(CenterX)
+    createBotLastName = ImGui.InputTextWithHint("##BotLastName", "Enter a Bot Last Name (Optional)...", createBotLastName)
+    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + textInputPadding)
+    ImGui.SetNextItemWidth(CenterX)
+    createBotSuffix = ImGui.InputTextWithHint("##BotSuffix", "Enter a Bot Suffix (Optional)...", createBotSuffix)
     ImGui.SetCursorPos(ImVec2(CenterX + 16, firstCursorPos.y))
     ImGui.Text("Bot Name: %s", createBotName)
     ImGui.SetCursorPosX(CenterX + 16)
@@ -139,6 +154,10 @@ local function drawNameAndDetailsSection()
             end
             mq.cmdf("/say %s", createCmd)
             mq.cmdf("/say ^botspawn %s", createBotName)
+            events.SetEventState("SetBotTitle", true, function () return { createBotTitle, createBotName } end)
+            events.SetEventState("SetBotSuffix", true, function () return { createBotSuffix, createBotName } end)
+            events.SetEventState("SetBotLastName", true, function () return { createBotLastName, createBotName } end)
+
         else
             printf("Invalid or Missing Options Selected")
         end
@@ -147,7 +166,7 @@ end
 
 function createBotSubscreen.drawCreateBotSubscreen()
     ImGui.SetCursorPosX(16)
-    if ImGui.BeginChild("CreateBot", ImVec2(480, 512), ImGuiChildFlags.Border) then
+    if ImGui.BeginChild("CreateBot", ImVec2(480, 600), ImGuiChildFlags.Border) then
         utils.CenterText("Create A Bot")
         ImGui.SeparatorText("Races")
         drawRaceGrid()

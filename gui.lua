@@ -1,9 +1,10 @@
-local mq                 = require('mq')
-local imgui              = require('ImGui')
-local data               = require('data')
-local utils              = require('utils')
-local createBotSubscreen = require('screens/createBotSubscreen')
-local gui                = {}
+local mq                        = require('mq')
+local imgui                     = require('ImGui')
+local data                      = require('data')
+local utils                     = require('utils')
+local createBotSubscreen        = require('screens/createBotSubscreen')
+local botConfigurationSubscreen = require('screens/botConfigurationSubscreen')
+local gui                       = {}
 
 
 
@@ -75,7 +76,7 @@ local function drawBotManagementScreen()
         gui.SetActiveScreen("DeleteBot")
     end
     if selectedBotIndex ~= 0 then
-        gui.SetActiveSubscreen("BotDetails")
+        gui.SetActiveSubscreen("BotConfiguration")
     end
 end
 
@@ -87,8 +88,7 @@ local function drawDeleteBotSubscreen()
 end
 
 local function drawBotDetailsSubscreen()
-    local raceTexture = mq.FindTextureAnimation(data.CharacterBots[selectedBotIndex].Race .. 'Icon')
-    ImGui.DrawTextureAnimation(raceTexture, 48, 48)
+
 end
 
 
@@ -170,7 +170,12 @@ function gui.ScreenManager()
             for key, value in pairs(subscreen) do
                 if type(value) == "boolean" and value and key:match("^show") then
                     if subscreen.drawFunction then
-                        subscreen.drawFunction()
+                        if subscreen.args ~= nil then
+                            subscreen.drawFunction(unpack(subscreen.args()))
+                        else
+                            subscreen.drawFunction()
+                        end
+
                     end
                     break -- Only one active subscreen at a time
                 end
@@ -210,7 +215,7 @@ gui.Screens = {
 gui.Subscreens = {
     CreateBot = { parent = "BotManagement", showCreateBotSubscreen = false, drawFunction = createBotSubscreen.drawCreateBotSubscreen },
     DeleteBot = { parent = "BotManagement", showDeleteBotSubscreen = false, drawFunction = drawDeleteBotSubscreen },
-    BotDetails = { parent = "BotManagement", showBotDetailsSubscreen = false, drawFunction = drawBotDetailsSubscreen },
+    BotConfiguration = { parent = "BotManagement", showBotConfigurationSubscreen = false, drawFunction = botConfigurationSubscreen.drawBotConfigurationSubscreen, args = function() return { selectedBotIndex} end},
 }
 
 gui.buttonStates = {

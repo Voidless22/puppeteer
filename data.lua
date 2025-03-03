@@ -16,6 +16,11 @@ function data.SetBotData(key, botData)
     end
 end
 
+function data.GetBotData(index)
+return data.CharacterBots[tonumber(index)]
+end
+
+
 function data.GetBotNameList()
     return data.BotNameList
 end

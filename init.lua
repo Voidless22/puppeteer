@@ -19,6 +19,7 @@ local function main()
             end
         end
         end
+        events.EventStateManager()
     end
 end
 
