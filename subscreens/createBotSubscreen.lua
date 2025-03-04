@@ -164,7 +164,7 @@ local function drawNameAndDetailsSection()
     end
 end
 
-function createBotSubscreen.drawCreateBotSubscreen()
+function createBotSubscreen.drawCreateBotSubscreen(gui)
     ImGui.SetCursorPosX(16)
     if ImGui.BeginChild("CreateBot", ImVec2(480, 600), ImGuiChildFlags.Border) then
         utils.CenterText("Create A Bot")

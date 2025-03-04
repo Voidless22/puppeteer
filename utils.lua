@@ -143,12 +143,13 @@ function utils.findMatchInTable(line, table)
     return nil
 end
 
-function utils.CenterText(line)
+function utils.CenterText(line, ...)
+    local formattedLine = string.format(line, ...)
     local lastCursorPos = ImGui.GetCursorPosVec()
     local screenCenterX = ImGui.GetWindowSizeVec().x / 2
-    local textWidth = ImGui.CalcTextSize(line) / 2
+    local textWidth = ImGui.CalcTextSize(formattedLine) / 2
     ImGui.SetCursorPosX(screenCenterX - textWidth)
-    ImGui.Text(line)
+    ImGui.Text(formattedLine)
 end
 
 function utils.CenterItem()

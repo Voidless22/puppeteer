@@ -46,7 +46,10 @@ end
         Level = botLevel,
         Gender = botGender,
         Race = race,
-        Class = class
+        Class = class,
+        Title = '',
+        Surname = '',
+        Suffix = ''
     } )
 
 end
