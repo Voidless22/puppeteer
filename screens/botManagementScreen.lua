@@ -6,7 +6,7 @@ local botManagementScreen = {}
 local selectBotComboWidth = 350
 
 function botManagementScreen.DrawBotManagementScreen(gui)
-    if ImGui.Button("<", ImVec2(32, 32)) then
+    if ImGui.Button("<", ImVec2(24, 24)) then
         gui.selectedBotIndex = 0
         gui.SetActiveScreen("Welcome")
     end
@@ -25,7 +25,7 @@ function botManagementScreen.DrawBotManagementScreen(gui)
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
     if ImGui.Button("Create a Bot", ImVec2(buttonWidth, buttonSizeY)) then
         gui.selectedBotIndex = 0
-        gui.SetActiveSubscreen("CreateBot")
+        gui.SetActiveScreen("CreateBot")
     end
     ImGui.SameLine()
     if ImGui.Button("Refresh Bot List", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.refreshBotList.activated = true end

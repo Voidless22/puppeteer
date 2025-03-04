@@ -7,6 +7,7 @@ local botConfigurationSubscreen = require('subscreens/botConfigurationSubscreen'
 local welcomeScreen = require('screens/welcomeScreen')
 local botManagementScreen = require('screens/botManagementScreen')
 local globalDashboardScreen = require('screens/globalDashboardScreen')
+local CreateBotScreen       = require('screens/CreateBotScreen')
 
 local deleteBotSubscreen  = require('subscreens/deleteBotSubscreen')
 
@@ -15,7 +16,7 @@ local gui                       = {}
 local openPuppeteer, showPuppeteer = true, true
 
 gui.selectedBotIndex = 0
-
+gui.windowSize = ImVec2(512,768)
 function gui.GetButtonState(button)
     if button ~= nil then
         return gui.buttonStates[button]
@@ -36,11 +37,21 @@ function gui.SetButtonState(button, state)
     gui.buttonStates[button].activated = state
 end
 
+gui.Screens = {
+    Welcome = { showWelcomeScreen = true, drawFunction = function() welcomeScreen.DrawWelcomeScreen(gui) end },
+    BotManagement = { showBotManagementScreen = false, drawFunction = function() botManagementScreen.DrawBotManagementScreen(gui) end },
+    GlobalDashboard = { showGlobalDashboardScreen = false, drawFunction = function() globalDashboardScreen.DrawGlobalDashboardScreen(gui) end },
+    CreateBot = { showCreateBotScreen = false, drawFunction = function() CreateBotScreen.drawCreateBotScreen(gui) end}
+}
+gui.Subscreens = {
+    CreateBot = { parent = "BotManagement", showCreateBotSubscreen = false, drawFunction = function() createBotSubscreen.drawCreateBotSubscreen(gui) end },
+    DeleteBot = { parent = "BotManagement", showDeleteBotSubscreen = false, drawFunction = function() deleteBotSubscreen.drawDeleteBotSubscreen(gui) end },
+    BotConfiguration = { parent = "BotManagement", showBotConfigurationSubscreen = false, drawFunction = function() botConfigurationSubscreen.drawBotConfigurationSubscreen(gui.selectedBotIndex, gui) end},
+}
 
-
-local function drawGlobalDashboardScreen()
-
-end
+gui.buttonStates = {
+    refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
+}
 
 
 function gui.SetActiveScreen(screenName)
@@ -156,20 +167,7 @@ function gui.guiLoop()
     ImGui.End()
 end
 
-gui.Screens = {
-    Welcome = { showWelcomeScreen = true, drawFunction = function() welcomeScreen.DrawWelcomeScreen(gui) end },
-    BotManagement = { showBotManagementScreen = false, drawFunction = function() botManagementScreen.DrawBotManagementScreen(gui) end },
-    GlobalDashboard = { showGlobalDashboardScreen = false, drawFunction = function() globalDashboardScreen.DrawGlobalDashboardScreen(gui) end }
-}
-gui.Subscreens = {
-    CreateBot = { parent = "BotManagement", showCreateBotSubscreen = false, drawFunction = function() createBotSubscreen.drawCreateBotSubscreen(gui) end },
-    DeleteBot = { parent = "BotManagement", showDeleteBotSubscreen = false, drawFunction = function() deleteBotSubscreen.drawDeleteBotSubscreen(gui) end },
-    BotConfiguration = { parent = "BotManagement", showBotConfigurationSubscreen = false, drawFunction = function() botConfigurationSubscreen.drawBotConfigurationSubscreen(gui.selectedBotIndex, gui) end},
-}
 
-gui.buttonStates = {
-    refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
-}
 
 
 
