@@ -62,8 +62,27 @@ function gui.GetActiveSubscreen()
     end
     return nil -- No active subscreen found
 end
+function gui.GetActiveScreen()
+    for name, screen in pairs(gui.Screens) do
+        for key, value in pairs(screen) do
+            if type(value) == "boolean" and key:match("^show") and value then
+                return name, screen -- Return the active screen name and its table
+            end
+        end
+    end
+    return nil -- No active screen found
+end
 
 function gui.SetActiveScreen(screenName)
+    -- step one is clear the subscreens.
+    for name, subscreen in pairs(gui.Subscreens) do
+        for key, value in pairs(subscreen) do
+            if type(value) == "boolean" and key:match("^show") then
+                subscreen[key] = false
+            end
+        end
+    end
+
     -- Only one screen should be active, so starting by disabling all of them.
     for name, screen in pairs(gui.Screens) do
         for key, value in pairs(screen) do
@@ -72,6 +91,7 @@ function gui.SetActiveScreen(screenName)
             end
         end
     end
+
 
     -- Now let's enable the screen we want.
     local selectedScreen = gui.Screens[screenName]
@@ -86,8 +106,6 @@ function gui.SetActiveScreen(screenName)
         printf("Missing Screen: %s", screenName)
     end
 
-    -- now we need to make sure all the subscreens are disabled.
-    gui.SetActiveSubscreen(nil)
 end
 
 function gui.SetActiveSubscreen(subscreenName)

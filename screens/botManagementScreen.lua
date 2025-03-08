@@ -9,14 +9,15 @@ function botManagementScreen.DrawBotManagementScreen(gui)
     if ImGui.Button("<", ImVec2(24, 24)) then
         gui.selectedBotIndex = 0
         if gui.GetActiveSubscreen() == 'SelectBot' then
-        gui.SetActiveScreen("Welcome")
-        elseif gui.GetActiveSubscreen() == 'BotConfiguration' then
+            gui.SetActiveScreen("Welcome")
+            return
+        end
+
+        if gui.GetActiveSubscreen() == 'BotConfiguration' then
             gui.SetActiveSubscreen("SelectBot")
         end
-    
-
     end
-    if gui.selectedBotIndex == 0 then
+    if gui.selectedBotIndex == 0 and gui.GetActiveScreen("BotManagement") then
         ImGui.SameLine()
         gui.SetActiveSubscreen("SelectBot")
     else

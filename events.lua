@@ -41,7 +41,7 @@ end
 
     printf('Bot List Event')
 
-    data.SetBotData(botIndex, {
+    data.initBotData(tonumber(botIndex), {
         Name = botName,
         Level = botLevel,
         Gender = botGender,
@@ -53,6 +53,9 @@ end
     } )
 
 end
+
+
+
 function events.GetEventState(event)
     if event ~= nil then
         return events.eventStates[event]
