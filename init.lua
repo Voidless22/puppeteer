@@ -11,14 +11,7 @@ local function main()
     while Running do
         mq.doevents()
         mq.delay(10)
-        for index, value in pairs(gui.GetButtonState()) do
-            if value ~= nil then
-            if value.activated and not value.guiButton then
-                value.callback()
-                gui.SetButtonState(index, false)
-            end
-        end
-        end
+        gui.ButtonStateManager()
         events.EventStateManager()
     end
 end

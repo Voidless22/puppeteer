@@ -5,7 +5,7 @@ local utils = require('utils')
 local welcomeScreen = {}
 
 local welcomeButtons = {
-    { text = 'Group/Raid Management',    callback = function(gui) gui.SetActiveScreen("PartyManagement") end },
+    { text = 'Group Management',         callback = function(gui) gui.SetActiveScreen("GroupManagement") end },
     { text = 'Dashboard',                callback = function(gui) gui.SetActiveScreen("Dashboard") end },
     { text = 'Modify Bot Settings',      callback = function(gui) gui.SetActiveScreen("BotManagement") end },
     { text = 'Create A Bot',             callback = function(gui) gui.SetActiveScreen("CreateBot") end },
@@ -27,12 +27,12 @@ end
 local function CreateButtonGrid(gui, buttonSize, buttonPadding, buttonTable)
     local windowWidth = ImGui.GetWindowSizeVec().x
     local columnCount = math.floor((windowWidth - (buttonPadding * 2)) / (buttonSize.x + buttonPadding))
-    ImGui.SetCursorPosX(windowWidth / #buttonTable - buttonPadding )
+    ImGui.SetCursorPosX(windowWidth / #buttonTable - buttonPadding)
     local StartCursorPos = ImGui.GetCursorPosVec()
 
     local currentColumn = 1
     local currentRow = 1
-    
+
     for _, value in ipairs(buttonTable) do
         local lastCursorPos = ImGui.GetCursorPosVec()
         if ImGui.Button(value.text, ImVec2(buttonSize.x, buttonSize.y)) then
@@ -55,7 +55,7 @@ function welcomeScreen.DrawWelcomeScreen(gui)
     utils.CenterText("Welcome to Puppeteer.")
     local maxTextSize = getMaxButtonTextSize(welcomeButtons)
     ImGui.SetCursorPosX(16)
-    CreateButtonGrid(gui,ImVec2(maxTextSize, 42), 4, welcomeButtons)
+    CreateButtonGrid(gui, ImVec2(maxTextSize, 42), 4, welcomeButtons)
 end
 
 return welcomeScreen
