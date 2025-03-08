@@ -2,14 +2,13 @@ local mq                        = require('mq')
 local imgui                     = require('ImGui')
 local data                      = require('data')
 local utils                     = require('utils')
-local createBotSubscreen        = require('subscreens/createBotSubscreen')
-local botConfigurationSubscreen = require('subscreens/botConfigurationSubscreen')
 local welcomeScreen = require('screens/welcomeScreen')
 local botManagementScreen = require('screens/botManagementScreen')
-local globalDashboardScreen = require('screens/globalDashboardScreen')
+local dashboardScreen = require('screens/dashboardScreen')
 local CreateBotScreen       = require('screens/CreateBotScreen')
 
-local deleteBotSubscreen  = require('subscreens/deleteBotSubscreen')
+local selectBotSubscreen    = require('subscreens/selectBotSubscreen')
+local botConfigurationSubscreen = require('subscreens/botConfigurationSubscreen')
 
 local gui                       = {}
 
@@ -40,12 +39,12 @@ end
 gui.Screens = {
     Welcome = { showWelcomeScreen = true, drawFunction = function() welcomeScreen.DrawWelcomeScreen(gui) end },
     BotManagement = { showBotManagementScreen = false, drawFunction = function() botManagementScreen.DrawBotManagementScreen(gui) end },
-    GlobalDashboard = { showGlobalDashboardScreen = false, drawFunction = function() globalDashboardScreen.DrawGlobalDashboardScreen(gui) end },
+    Dashboard = { showDashboardScreen = false, drawFunction = function() dashboardScreen.DrawDashboardScreen(gui) end },
     CreateBot = { showCreateBotScreen = false, drawFunction = function() CreateBotScreen.drawCreateBotScreen(gui) end}
 }
 gui.Subscreens = {
-    CreateBot = { parent = "BotManagement", showCreateBotSubscreen = false, drawFunction = function() createBotSubscreen.drawCreateBotSubscreen(gui) end },
-    DeleteBot = { parent = "BotManagement", showDeleteBotSubscreen = false, drawFunction = function() deleteBotSubscreen.drawDeleteBotSubscreen(gui) end },
+    SelectBot = { parent = "BotManagement", showSelectBotSubscreen = false, drawFunction = function() selectBotSubscreen.drawSelectBotSubscreen(gui) end },
+
     BotConfiguration = { parent = "BotManagement", showBotConfigurationSubscreen = false, drawFunction = function() botConfigurationSubscreen.drawBotConfigurationSubscreen(gui.selectedBotIndex, gui) end},
 }
 
@@ -53,6 +52,16 @@ gui.buttonStates = {
     refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
 }
 
+function gui.GetActiveSubscreen()
+    for name, subscreen in pairs(gui.Subscreens) do
+        for key, value in pairs(subscreen) do
+            if type(value) == "boolean" and key:match("^show") and value then
+                return name, subscreen -- Return the active subscreen name and its table
+            end
+        end
+    end
+    return nil -- No active subscreen found
+end
 
 function gui.SetActiveScreen(screenName)
     -- Only one screen should be active, so starting by disabling all of them.

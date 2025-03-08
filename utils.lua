@@ -125,6 +125,44 @@ utils.RaceTextures = {
     MWoodElf = mq.FindTextureAnimation("Wood ElfMaleIcon")
 }
 
+utils.EquipmentSlotTextures = {
+    mq.FindTextureAnimation("A_InvEar"),
+    mq.FindTextureAnimation("A_InvHead"),
+    mq.FindTextureAnimation("A_InvFace"),
+    mq.FindTextureAnimation("A_InvEar"),
+    mq.FindTextureAnimation("A_InvChest"),
+    mq.FindTextureAnimation("A_InvArms"),
+    mq.FindTextureAnimation("A_InvWaist"),
+    mq.FindTextureAnimation("A_InvWrist"),
+    mq.FindTextureAnimation("A_InvLegs"),
+    mq.FindTextureAnimation("A_InvHands"),
+    mq.FindTextureAnimation("A_InvCharm"),
+    mq.FindTextureAnimation("A_InvFeet"),
+    mq.FindTextureAnimation("A_InvWrist"),
+    mq.FindTextureAnimation("A_InvShoulders"),
+    mq.FindTextureAnimation("A_InvAboutBody"),
+    mq.FindTextureAnimation("A_InvNeck"),
+    mq.FindTextureAnimation("A_InvNeck"),
+    mq.FindTextureAnimation("A_InvNeck"),
+    mq.FindTextureAnimation("A_InvNeck"),
+    mq.FindTextureAnimation("A_InvNeck"),
+    mq.FindTextureAnimation("A_InvNeck"),
+    mq.FindTextureAnimation("A_InvNeck")
+
+
+
+}
+
+ function utils.getMaxButtonTextSize(textTable)
+    local maxTextSize = 0
+    for index, value in pairs(textTable) do
+        if ImGui.CalcTextSize(value) > maxTextSize then
+            maxTextSize = ImGui.CalcTextSize(value)
+        end
+    end
+    return maxTextSize + 6
+end
+
 
 function utils.IsValidRaceClassCombo(race, class)
     if race == '' then return false end
