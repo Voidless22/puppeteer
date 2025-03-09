@@ -16,28 +16,56 @@ local projectedGroup = {}
 local includeSelfInProjectedGrp = false
 local lastModifiedGroupIndex = nil
 
+
+local function prepGroupData(gui, selectedGroup)
+    -- clean the slate for projected group
+    projectedGroup = {}
+    -- now let's get the group we actually want
+    projectedGroup = data.GetGroupComposition(selectedGroup)
+    -- is this a new group from the last time we did this? if so let's set the initial Group Name, and refresh our last index.
+    if lastModifiedGroupIndex ~= gui.selectedGroupIndex then
+        groupName = selectedGroup
+        lastModifiedGroupIndex = gui.selectedGroupIndex
+    end
+    -- okay, since this group was already made, am I in here? let's flip that switch if I am.
+    for _, value in ipairs(projectedGroup) do
+        if value == mq.TLO.Me.Name() then
+            includeSelfInProjectedGrp = true
+        end
+    end
+end
+
+local function saveGroupData(gui, groupName, projectedGroup)
+    -- let's save it in our groups table
+    data.SetGroupComposition(groupName, projectedGroup)
+    -- then write the entire groups table again
+    mq.pickle('puppeteer-groups.lua', data.GetGroupComposition())
+    -- clear index slates and go back to select
+    gui.clearGroupManagementSelections()
+    gui.SetActiveSubscreen("SelectGroup")
+end
+
+
+
 function createGroupSubscreen.drawCreateGroupSubscreen(gui, selectedGroup)
     -- We have a group selected to read from, let's get the data prepped
     if selectedGroup ~= nil then
-        projectedGroup = {}
-        projectedGroup = data.GetGroupComposition(selectedGroup)
+        prepGroupData(gui, selectedGroup)
+    else
+        -- let's refresh our indexes
         if lastModifiedGroupIndex ~= gui.selectedGroupIndex then
+            gui.clearGroupManagementSelections()
+            projectedGroup = {}
             groupName = selectedGroup
             lastModifiedGroupIndex = gui.selectedGroupIndex
         end
-        for _, value in ipairs(projectedGroup) do
-            if value == mq.TLO.Me.Name() then
-                includeSelfInProjectedGrp = true
-            end
-        end
     end
-
 
     utils.CenterText("Create a Group")
     utils.BetterNewLine(5)
     utils.CenterText("Group Name")
     includeSelfInProjectedGrp = ImGui.Checkbox("Include Self In Group", includeSelfInProjectedGrp)
-
+    -- We already did this check in prepGroupData, but A) if there isn't a group to prep, and B) if the value is changed, we need to do this.
     -- Are we supposed to be in group?
     local foundInGroup = false
     for _, value in ipairs(projectedGroup) do
@@ -49,7 +77,7 @@ function createGroupSubscreen.drawCreateGroupSubscreen(gui, selectedGroup)
             end
         end
     end
-
+    -- okay we aren't in the group, and we're supposed to be. Is there room? if so, add us in, if not let the user know.
     if not foundInGroup and includeSelfInProjectedGrp then
         if #projectedGroup < 6 then
             table.insert(projectedGroup, mq.TLO.Me.Name())
@@ -64,12 +92,9 @@ function createGroupSubscreen.drawCreateGroupSubscreen(gui, selectedGroup)
     ImGui.SetNextItemWidth(200)
     groupName = ImGui.InputText("##CreateGroupName", groupName)
     ImGui.SameLine()
+
     if ImGui.Button("Save Group", ImVec2(96, 24)) then
-        data.SetGroupComposition(groupName, projectedGroup)
-        mq.pickle('puppeteer-groups.lua', data.GetGroupComposition())
-        gui.selectedGroupIndex = nil
-        gui.SelectedGroupName = nil
-        gui.SetActiveSubscreen("SelectGroup")
+        saveGroupData(gui, groupName, projectedGroup)
     end
     utils.BetterNewLine(5)
     utils.CenterText("Projected Group")

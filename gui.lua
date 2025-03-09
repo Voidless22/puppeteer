@@ -76,6 +76,13 @@ gui.Subscreens = {
     },
 }
 
+function gui.clearGroupManagementSelections()
+    gui.selectedGroupIndex             = 0
+    gui.selectedGroupName              = nil
+    
+end
+
+
 
 
 function gui.GetActiveSubscreen()

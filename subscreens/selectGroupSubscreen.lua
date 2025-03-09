@@ -5,15 +5,20 @@ local data                  = require('data')
 local events                = require('events')
 local selectGroupSubscreen  = {}
 
+local FLT_MIN, FLT_MAX      = mq.NumericLimits_Float()
 
 local selectGroupComboWidth = 350
+local buttonPadding         = 4
+local buttonSizeY           = 24
+local buttonWidth           = (selectGroupComboWidth / 2) - buttonPadding
 
-local buttonPadding = 4
-local buttonSizeY = 24
-local buttonWidth = (selectGroupComboWidth / 2) - buttonPadding
+local showDeleteModal       = false
+
 function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
+    local startPoint = (ImGui.GetWindowSizeVec().x - selectGroupComboWidth) / 2
+
     ImGui.SetCursorPosY((ImGui.GetWindowSizeVec().y / 2) - 24 - ((26 * imgui.GetTextLineHeightWithSpacing()) / 2))
-    
+
     utils.CenterText("Select or Create a Group...")
 
     ImGui.PushItemWidth(selectGroupComboWidth)
@@ -21,30 +26,56 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
     gui.selectedGroupIndex = ImGui.ListBox("##GroupList", gui.selectedGroupIndex, data.GetGroupCompositionList(), nil, 25)
     ImGui.PopItemWidth()
 
-    local startPoint = (ImGui.GetWindowSizeVec().x - selectGroupComboWidth) / 2
 
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
     if ImGui.Button("Create a Group", ImVec2(buttonWidth, buttonSizeY)) then
-        gui.selectedGroupIndex = 0
-        gui.selectedGroupName = nil
+        gui.clearGroupManagementSelections()
         gui.previousSubscreen = "SelectGroup"
         gui.SetActiveSubscreen("CreateGroup")
     end
     ImGui.SameLine()
     if ImGui.Button("Delete a Group", ImVec2(buttonWidth, buttonSizeY)) then
-        gui.selectedGroupIndex = 0
-        gui.previousSubscreen = "SelectGroup"
-        gui.SetActiveSubscreen("DeleteGroup")
+        if gui.selectedGroupIndex > 0 then
+            if not ImGui.IsPopupOpen("Delete Group?") then
+                ImGui.OpenPopup("Delete Group?")
+            end
+        end
     end
+    local viewport = ImGui.GetMainViewport()
+    local center = viewport.Pos + (viewport.Size * 0.5)
+
+    ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, ImVec2(0.5, 0.5)) -- Centered
+    ImGui.SetNextWindowSizeConstraints(ImVec2(200, 0), ImVec2(FLT_MAX, FLT_MAX))
+    if ImGui.BeginPopupModal("Delete Group?", nil, bit32.bor(ImGuiWindowFlags.NoResize, ImGuiWindowFlags.NoMove)) then
+        utils.CenterText("Are you sure you want to delete this group?")
+        utils.CenterText(data.GetGroupCompositionList()[gui.selectedGroupIndex])
+        local startPoint = (ImGui.GetWindowSizeVec().x - selectGroupComboWidth) / 2
+        ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
+
+        if ImGui.Button("Yes", ImVec2(buttonWidth, buttonSizeY)) then
+            data.SetGroupComposition(data.GetGroupCompositionList()[gui.selectedGroupIndex], nil)
+            mq.pickle('puppeteer-groups.lua', data.GetGroupComposition())
+            gui.clearGroupManagementSelections()
+            ImGui.CloseCurrentPopup()
+        end
+        ImGui.SameLine()
+        if ImGui.Button("No", ImVec2(buttonWidth, buttonSizeY)) then
+            ImGui.CloseCurrentPopup()
+        end
+
+        ImGui.EndPopup()
+    end
+
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
 
     if ImGui.Button("Spawn + Invite Group", ImVec2(buttonWidth, buttonSizeY)) and gui.selectedGroupIndex ~= 0 then
         gui.selectedGroupName = data.GetGroupCompositionList()[gui.selectedGroupIndex]
-        events.SetEventState("SpawnBotGroup", true, function() return { data.GetGroupComposition(gui.selectedGroupName) } end)
+        events.SetEventState("SpawnBotGroup", true,
+            function() return { data.GetGroupComposition(gui.selectedGroupName) } end)
     end
     ImGui.SameLine()
 
-    if ImGui.Button("Edit Selected Group",ImVec2(buttonWidth, buttonSizeY)) then
+    if ImGui.Button("Edit Selected Group", ImVec2(buttonWidth, buttonSizeY)) then
         gui.selectedGroupName = data.GetGroupCompositionList()[gui.selectedGroupIndex]
         gui.previousSubscreen = "SelectGroup"
         gui.SetActiveSubscreen("CreateGroup")
