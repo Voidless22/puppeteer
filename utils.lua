@@ -173,13 +173,16 @@ function utils.IsValidRaceClassCombo(race, class)
 end
 
 function utils.findMatchInTable(line, table)
+    local trimmedLine = line:gsub("%s+", ""):lower()
     for _, value in ipairs(table) do
-        if string.find(line, value, 1, true) then
+        local trimmedValue = value:gsub("%s+", ""):lower()
+        if string.find(trimmedLine, trimmedValue, 1, true) then
             return value
         end
     end
     return nil
 end
+
 
 function utils.CenterText(line, ...)
     local formattedLine = string.format(line, ...)
@@ -190,8 +193,19 @@ function utils.CenterText(line, ...)
     ImGui.Text(formattedLine)
 end
 
-function utils.CenterItem()
+function utils.CenterItem(width)
+    if width == nil then
     ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (ImGui.CalcItemWidth() / 2))
+else
+    ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (width / 2))
+
+end
+
+
+end
+function utils.BetterNewLine(spacing)
+    ImGui.SetCursorPosY(ImGui.GetCursorPosY() + spacing)
+
 end
 
 return utils

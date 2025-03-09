@@ -26,6 +26,7 @@ end
 
 
 initEvents()
+data.loadBotGroupConfigurations()
 
 mq.imgui.init("Puppeteer", gui.guiLoop)
 main()

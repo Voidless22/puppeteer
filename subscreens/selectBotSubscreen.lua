@@ -11,7 +11,7 @@ function selectBotSubscreen.drawSelectBotSubscreen(gui)
     ImGui.PushItemWidth(selectBotComboWidth)
     utils.CenterItem()
 
-    gui.selectedBotIndex = ImGui.ListBox("##BotList", gui.selectedBotIndex, data.GetBotNameList(), nil, 25)
+    gui.botConfigSelectedBotIndex = ImGui.ListBox("##BotList", gui.botConfigSelectedBotIndex, data.GetBotNameList(), nil, 25)
     ImGui.PopItemWidth()
 
     local buttonPadding = 4
@@ -21,14 +21,14 @@ function selectBotSubscreen.drawSelectBotSubscreen(gui)
 
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
     if ImGui.Button("Create a Bot", ImVec2(buttonWidth, buttonSizeY)) then
-        gui.selectedBotIndex = 0
+        gui.botConfigSelectedBotIndex = 0
         gui.SetActiveScreen("CreateBot")
     end
     ImGui.SameLine()
     if ImGui.Button("Refresh Bot List", ImVec2(buttonWidth, buttonSizeY)) then gui.buttonStates.refreshBotList.activated = true end
     ImGui.SameLine()
     if ImGui.Button("Delete a Bot", ImVec2(buttonWidth, buttonSizeY)) then
-        gui.selectedBotIndex = 0
+        gui.botConfigSelectedBotIndex = 0
         gui.SetActiveScreen("DeleteBot")
     end
 end

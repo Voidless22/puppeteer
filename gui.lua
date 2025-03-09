@@ -20,11 +20,14 @@ local gui                          = {}
 
 local openPuppeteer, showPuppeteer = true, true
 
-gui.selectedBotIndex               = 0
+gui.botConfigSelectedBotIndex      = 0
 gui.selectedGroupIndex             = 0
-gui.windowSize                     = ImVec2(512, 768)
+gui.selectedGroupName              = nil
 
-gui.previousSubscreen              = ''
+
+gui.windowSize        = ImVec2(512, 768)
+
+gui.previousSubscreen = ''
 
 
 gui.Screens = {
@@ -62,13 +65,13 @@ gui.Subscreens = {
     CreateGroup = {
         parent = "GroupManagement",
         showCreateGroupSubscreen = false,
-        drawFunction = function() createGroupSubscreen.drawCreateGroupSubscreen(gui) end
+        drawFunction = function() createGroupSubscreen.drawCreateGroupSubscreen(gui, gui.selectedGroupName) end
     },
     BotConfiguration = {
         parent = "BotManagement",
         showBotConfigurationSubscreen = false,
         drawFunction = function()
-            botConfigurationSubscreen.drawBotConfigurationSubscreen(gui.selectedBotIndex, gui)
+            botConfigurationSubscreen.drawBotConfigurationSubscreen(gui.botConfigSelectedBotIndex, gui)
         end
     },
 }
@@ -212,7 +215,7 @@ function gui.ButtonStateManager()
 end
 
 function gui.SetSelectedBot(botIndex)
-    gui.selectedBotIndex = botIndex
+    gui.botConfigSelectedBotIndex = botIndex
 end
 
 function gui.guiLoop()
