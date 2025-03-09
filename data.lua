@@ -12,10 +12,10 @@ data.Compositions = {
 }
 
 function data.loadBotGroupConfigurations()
-    local configData, err = loadfile(mq.configDir..'/puppeteer-groups.lua')
+    local configData, err = loadfile(mq.configDir..'/puppeteer-groups-'..mq.TLO.Me.Name()..'.lua')
     if err then
         -- failed to read the config file, create it using pickle
-        mq.pickle('puppeteer-groups.lua', data.Compositions.Groups)
+        mq.pickle('puppeteer-groups-'..mq.TLO.Me.Name()..'.lua', data.Compositions.Groups)
     elseif configData then
         -- file loaded, put content into your config table
         data.Compositions.Groups = configData()

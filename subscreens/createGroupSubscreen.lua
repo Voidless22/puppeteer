@@ -39,7 +39,7 @@ local function saveGroupData(gui, groupName, projectedGroup)
     -- let's save it in our groups table
     data.SetGroupComposition(groupName, projectedGroup)
     -- then write the entire groups table again
-    mq.pickle('puppeteer-groups.lua', data.GetGroupComposition())
+    mq.pickle('puppeteer-groups-'.. mq.TLO.Me.Name() ..'.lua', data.GetGroupComposition())
     -- clear index slates and go back to select
     gui.clearGroupManagementSelections()
     gui.SetActiveSubscreen("SelectGroup")

@@ -12,6 +12,48 @@ local createBotLastName = ''
 local createBotSuffix = ''
 local ClassRaceIconPadding = 4
 local ClassRaceIconSize = 48
+
+
+local syllables = {
+    "al", "ar", 'an','am','at','ail',
+    "bal", "bel", 'ben','bea','ba','bu','ber',
+    "cor", 'can','car','cal',
+    "dar", 'del','da','de','du','di','dy',
+    "el", 'ea', 'ei','em','en','er','eu',
+    "fal", 'fel','fa','fe','fu','fo','fi',
+    "gar",'ga','gu','ge','go',
+    "har", 'he','hu','ha','ho','hy',
+    "il", 'ia',' im','ie','iu','io','in','iz',
+    "jor", 'ju', 'juu','ja','je','ji','jo',
+    "kal",'ke','ka','ku','ki',
+    "lor", 'la','le','lu','lo','ly','li',
+    "mar",'me','mu','mei',
+    "nor", 'ni','ne','no','nu',
+    "or", 'ou','on','oa','op',
+    "pal", 'pan','pen', 'par',
+    "qar", 'qe','qu',
+    "ral", 'ran', 'ro','ru','re',
+    "sar", 'san','sa','sil','su',
+    "tor",'te','ta','to',
+    "ul", 'un','um','ue','ut','ur',
+    "val",'vel','ve','va','ver','vu','vi',
+    "war",'wel','we','wu','wo','wa','wi','wy',
+    "xil", 'xy','xen',
+    "yor", 'yu', 'ya',
+    "zor", 'zil', 'za'
+}
+
+local function generateName()
+    local name = ""
+    for i = 1, math.random(2, 5) do
+        name = name .. syllables[math.random(#syllables)]
+    end
+    name = name:sub(1, 1):upper() .. name:sub(2) 
+     -- Capitalize first letter
+     return name:gsub("%s+","")
+end
+
+
 local function drawRaceGrid()
     local drawlist = ImGui.GetWindowDrawList()
     -- Grid Values
@@ -141,6 +183,11 @@ local function drawNameAndDetailsSection()
         ImGui.Text("Gender/Sex: Female")
     end
     ImGui.SetCursorPosX(CenterX + 16)
+    if ImGui.Button("Generate Random Name", ImVec2(160,32)) then
+        createBotName = generateName()
+    end
+    ImGui.SetCursorPosX(CenterX + 16)
+
     if ImGui.Button("Create Bot", ImVec2(96, 32)) then
         if botCreateSelectedClass and botCreateSelectedGender and botCreateSelectedRace and createBotName then
             local createCmd = '^botcreate ' .. createBotName
@@ -163,10 +210,20 @@ local function drawNameAndDetailsSection()
     end
 end
 
+local function clearCreateSettings()
+    botCreateSelectedClass = ''
+    botCreateSelectedRace = ''
+    createBotName = ''
+    createBotLastName = ''
+    createBotSuffix = ''
+    createBotTitle = ''
+end
+
 
 function createBotScreen.drawCreateBotScreen(gui) 
     ImGui.SetCursorPosX(8)
     if ImGui.Button("<", ImVec2(24,24)) then
+        clearCreateSettings()
         gui.SetActiveScreen("Welcome")
     end
     ImGui.SameLine()
