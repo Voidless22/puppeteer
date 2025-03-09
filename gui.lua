@@ -82,6 +82,9 @@ function gui.clearGroupManagementSelections()
     
 end
 
+function gui.ToggleWindowShow()
+    openPuppeteer = not openPuppeteer
+end
 
 
 
@@ -226,13 +229,15 @@ function gui.SetSelectedBot(botIndex)
 end
 
 function gui.guiLoop()
-    showPuppeteer, openPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
-    if showPuppeteer then
-        ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
-        gui.ScreenManager()
-        gui.ButtonStateManager()
+    if openPuppeteer then  -- Only try to render if the window should be shown
+        openPuppeteer, showPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
+        if showPuppeteer then
+            ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
+            gui.ScreenManager()
+            gui.ButtonStateManager()
+        end
+        ImGui.End()
     end
-    ImGui.End()
 end
 
 return gui
