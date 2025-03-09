@@ -15,6 +15,21 @@ local function SetBotTitleEventCallback(botTitle, botName)
     end
 end
 
+local function deleteBotEventCallback(botName)
+    if not mq.TLO.Spawn(botName)() then
+        mq.cmdf('/say ^botspawn %s', botName)
+        mq.delay(10000, function() return mq.TLO.Spawn(botName)() end)
+    end
+    if mq.TLO.Spawn(botName)() then
+        mq.cmdf('/target %s', botName)
+        mq.delay(500)
+        mq.cmdf('/say ^botdelete')
+        mq.delay(2000)
+        mq.cmdf('/say ^botdelete confirm')
+    end
+end
+
+
 local function SetBotLastNameEventCallback(botLastName, botName)
     if botLastName == '' then return end
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
@@ -102,6 +117,10 @@ local function spawnBotGroupEventCallback(groupMembers)
     end
 end
 
+local function refreshBotListEventCallback()
+end
+
+
 function events.getBotList(line, botIndex, botName, botLevel, botGender, botDetails)
     local race = utils.findMatchInTable(botDetails, utils.Races)
     local class = utils.findMatchInTable(botDetails, utils.Classes)
@@ -162,7 +181,9 @@ events.eventStates = {
     SetBotTitle = { activated = false, callback = SetBotTitleEventCallback, args = {} },
     SetBotSuffix = { activated = false, callback = SetBotSuffixEventCallback, args = {} },
     SetBotLastName = { activated = false, callback = SetBotLastNameEventCallback, args = {} },
-    SpawnBotGroup = { activated = false, callback = spawnBotGroupEventCallback, args = {} }
+    SpawnBotGroup = { activated = false, callback = spawnBotGroupEventCallback, args = {} },
+    DeleteBot = { activated = false, callback = deleteBotEventCallback, args = {} },
+    refreshBotList = {activated = false, callback = data.refreshBotListButton, args = nil}
 }
 
 return events

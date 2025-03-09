@@ -116,6 +116,8 @@ function data.GetBotNameList()
 end
 
 function data.refreshBotListButton()
+    data.BotNameList = {}
+    data.CharacterBots = {}
     mq.cmd('/say ^botlist')
     mq.delay(500)
     mq.doevents()
