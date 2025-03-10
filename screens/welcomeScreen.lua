@@ -7,10 +7,11 @@ local welcomeScreen = {}
 local welcomeButtons = {
     { text = 'Group Management',         callback = function(gui) gui.SetActiveScreen("GroupManagement") end },
     { text = 'Dashboard',                callback = function(gui) gui.SetActiveScreen("Dashboard") end },
-    { text = 'Modify Bots',      callback = function(gui) gui.SetActiveScreen("BotManagement") end },
+    { text = 'Modify Bots',              callback = function(gui) gui.SetActiveScreen("BotManagement") end },
     { text = 'Create A Bot',             callback = function(gui) gui.SetActiveScreen("CreateBot") end },
     { text = 'Customize Bot Appearance', screen = 'CustomizeBot' },
     { text = 'Puppeteer Settings',       screen = 'PuppeteerSettings' },
+    { text = "Open Global Dashbar",      callback = function(gui) gui.ToggleShowGlobalDashbar() end }
 
 }
 

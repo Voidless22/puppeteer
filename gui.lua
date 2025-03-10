@@ -2,6 +2,7 @@ local mq                           = require('mq')
 local imgui                        = require('ImGui')
 local data                         = require('data')
 local utils                        = require('utils')
+local globalDashbar                = require('globalDashbar')
 
 -- Screens
 local welcomeScreen                = require('screens/welcomeScreen')
@@ -19,6 +20,7 @@ local createGroupSubscreen         = require('subscreens/createGroupSubscreen')
 local gui                          = {}
 
 local openPuppeteer, showPuppeteer = true, true
+local openGlobalDashbar, showGlobalDashbar = false,true
 
 gui.botConfigSelectedBotIndex      = 0
 gui.selectedGroupIndex             = 0
@@ -82,11 +84,26 @@ function gui.clearGroupManagementSelections()
     
 end
 
-function gui.ToggleWindowShow()
-    openPuppeteer = not openPuppeteer
+function gui.ToggleShowGlobalDashbar()
+    openGlobalDashbar = not openGlobalDashbar
 end
 
 
+function gui.DrawGlobalDashbarWindow()
+    if openGlobalDashbar then  -- Only try to render if the window should be shown
+        openGlobalDashbar, showGlobalDashbar = ImGui.Begin("Global Dashbar", openGlobalDashbar)
+        if showGlobalDashbar then
+            globalDashbar.DrawGlobalDashbar(gui)
+        end
+        ImGui.End()
+    end
+end
+
+
+
+function gui.ToggleWindowShow()
+    openPuppeteer = not openPuppeteer
+end
 
 function gui.GetActiveSubscreen()
     for name, subscreen in pairs(gui.Subscreens) do
@@ -109,7 +126,6 @@ function gui.GetActiveScreen()
     end
     return nil -- No active screen found
 end
-
 function gui.SetActiveScreen(screenName)
     -- step one is clear the subscreens.
     for name, subscreen in pairs(gui.Subscreens) do
@@ -144,7 +160,6 @@ function gui.SetActiveScreen(screenName)
         printf("Missing Screen: %s", screenName)
     end
 end
-
 function gui.SetActiveSubscreen(subscreenName)
     -- same deal as screens, clear the slate and disable all of them.
     for name, subscreen in pairs(gui.Subscreens) do
@@ -175,7 +190,6 @@ function gui.SetActiveSubscreen(subscreenName)
         end
     end
 end
-
 function gui.ScreenManager()
     -- Find and draw the active screen
     for name, screen in pairs(gui.Screens) do
@@ -208,11 +222,9 @@ function gui.ScreenManager()
         end
     end
 end
-
 gui.buttonStates = {
     refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
 }
-
 function gui.ButtonStateManager()
     for index, value in pairs(gui.buttonStates) do
         if value ~= nil then
@@ -223,11 +235,9 @@ function gui.ButtonStateManager()
         end
     end
 end
-
 function gui.SetSelectedBot(botIndex)
     gui.botConfigSelectedBotIndex = botIndex
-end
-
+end       
 function gui.guiLoop()
     if openPuppeteer then  -- Only try to render if the window should be shown
         openPuppeteer, showPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
@@ -238,6 +248,7 @@ function gui.guiLoop()
         end
         ImGui.End()
     end
+    gui.DrawGlobalDashbarWindow()
 end
 
 return gui

@@ -50,7 +50,7 @@ local function drawCenterRect(selectedBotIndex, gui)
 
     local rectScreenStartPos = lastCursorScreenPos + (windowSize - centerRectSize) / 2
     local rectScreenEndPos = rectScreenStartPos + centerRectSize
-    
+
     rectTop = windowCenter.y - (centerRectSize.y / 2)
     rectCenterX = windowCenter.x
     rectCenterY = rectTop + (centerRectSize.y / 2)
@@ -104,12 +104,11 @@ end
 
 
 
-
 function botConfigurationSubscreen.drawBotConfigurationSubscreen(selectedBotIndex, gui)
     ImGui.SetCursorPosX(16)
     if ImGui.BeginChild("BotConfiguration", ImVec2(480, 512), ImGuiChildFlags.Border) then
         drawCenterRect(selectedBotIndex, gui)
-        drawInventoryCenter(selectedBotIndex, gui)
+      --  drawInventoryCenter(selectedBotIndex, gui)
 
         ImGui.EndChild()
     end
