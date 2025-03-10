@@ -4,7 +4,7 @@ local data = require('data')
 local events = {}
 
 
-local function SetBotTitleEventCallback(botTitle, botName)
+local function SetBotTitleButtonCallback(botTitle, botName)
     if botTitle == '' then return end
 
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
@@ -15,7 +15,7 @@ local function SetBotTitleEventCallback(botTitle, botName)
     end
 end
 
-local function deleteBotEventCallback(botName)
+local function deleteBotButtonCallback(botName)
     if not mq.TLO.Spawn(botName)() then
         mq.cmdf('/say ^botspawn %s', botName)
         mq.delay(10000, function() return mq.TLO.Spawn(botName)() end)
@@ -24,13 +24,16 @@ local function deleteBotEventCallback(botName)
         mq.cmdf('/target %s', botName)
         mq.delay(500)
         mq.cmdf('/say ^botdelete')
-        mq.delay(2000)
+        mq.delay(1000)
         mq.cmdf('/say ^botdelete confirm')
+        mq.delay(250)
+        mq.cmdf('/say ^botlist')
+
     end
 end
 
 
-local function SetBotLastNameEventCallback(botLastName, botName)
+local function SetBotLastNameButtonCallback(botLastName, botName)
     if botLastName == '' then return end
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
     if mq.TLO.Spawn(botName)() then
@@ -40,7 +43,7 @@ local function SetBotLastNameEventCallback(botLastName, botName)
     end
 end
 
-local function SetBotSuffixEventCallback(botSuffix, botName)
+local function SetBotSuffixButtonCallback(botSuffix, botName)
     if botSuffix == '' then return end
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
     if mq.TLO.Spawn(botName)() then
@@ -49,7 +52,7 @@ local function SetBotSuffixEventCallback(botSuffix, botName)
         mq.cmdf("/say ^suffix %s", botSuffix:gsub(" ", "_"))
     end
 end
-local function spawnBotGroupEventCallback(groupMembers)
+local function spawnBotGroupButtonCallback(groupMembers)
     local raidUnlocked = false
     local foundEmptyGroup = false
     local raidGroupCount = 12
@@ -117,8 +120,7 @@ local function spawnBotGroupEventCallback(groupMembers)
     end
 end
 
-local function refreshBotListEventCallback()
-end
+
 
 
 function events.getBotList(line, botIndex, botName, botLevel, botGender, botDetails)
@@ -139,16 +141,16 @@ function events.getBotList(line, botIndex, botName, botLevel, botGender, botDeta
     })
 end
 
-function events.GetEventState(event)
-    if event ~= nil then
-        return events.eventStates[event]
+function events.GetButtonState(button)
+    if button ~= nil then
+        return events.buttonStates[button]
     else
-        return events.eventStates
+        return events.buttonStates
     end
 end
 
-function events.SetEventState(event, state, args)
-    if event == nil then
+function events.SetButtonState(button, state, args)
+    if button == nil then
         printf('invalid event supplied to set state of.')
         return
     end
@@ -157,13 +159,13 @@ function events.SetEventState(event, state, args)
         return
     end
     if args ~= nil then
-        events.eventStates[event].args = args
+        events.buttonStates[button].args = args
     end
-    events.eventStates[event].activated = state
+    events.buttonStates[button].activated = state
 end
 
-function events.EventStateManager()
-    for index, value in pairs(events.GetEventState()) do
+function events.ButtonStateManager()
+    for index, value in pairs(events.GetButtonState()) do
         if value ~= nil then
             if value.activated then
                 if value.args ~= nil then
@@ -171,19 +173,18 @@ function events.EventStateManager()
                 else
                     value.callback()
                 end
-                events.eventStates[index].activated = false
+                events.buttonStates[index].activated = false
             end
         end
     end
 end
 
-events.eventStates = {
-    SetBotTitle = { activated = false, callback = SetBotTitleEventCallback, args = {} },
-    SetBotSuffix = { activated = false, callback = SetBotSuffixEventCallback, args = {} },
-    SetBotLastName = { activated = false, callback = SetBotLastNameEventCallback, args = {} },
-    SpawnBotGroup = { activated = false, callback = spawnBotGroupEventCallback, args = {} },
-    DeleteBot = { activated = false, callback = deleteBotEventCallback, args = {} },
-    refreshBotList = {activated = false, callback = data.refreshBotListButton, args = nil}
+events.buttonStates = {
+    SetBotTitle = { activated = false, callback = SetBotTitleButtonCallback, args = {} },
+    SetBotSuffix = { activated = false, callback = SetBotSuffixButtonCallback, args = {} },
+    SetBotLastName = { activated = false, callback = SetBotLastNameButtonCallback, args = {} },
+    SpawnBotGroup = { activated = false, callback = spawnBotGroupButtonCallback, args = {} },
+    DeleteBot = { activated = false, callback = deleteBotButtonCallback, args = {} },
 }
 
 return events

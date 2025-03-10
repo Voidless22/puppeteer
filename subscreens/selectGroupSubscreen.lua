@@ -70,7 +70,7 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
 
     if ImGui.Button("Spawn + Invite Group", ImVec2(buttonWidth, buttonSizeY)) and gui.selectedGroupIndex ~= 0 then
         gui.selectedGroupName = data.GetGroupCompositionList()[gui.selectedGroupIndex]
-        events.SetEventState("SpawnBotGroup", true,
+        events.SetButtonState("SpawnBotGroup", true,
             function() return { data.GetGroupComposition(gui.selectedGroupName) } end)
     end
     ImGui.SameLine()

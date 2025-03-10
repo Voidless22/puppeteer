@@ -30,8 +30,7 @@ function selectBotSubscreen.drawSelectBotSubscreen(gui)
     end
     ImGui.SameLine()
     if ImGui.Button("Refresh Bot List", ImVec2(buttonWidth, buttonSizeY)) then 
-        events.SetEventState("refreshBotList", true)
-
+        mq.cmd('/say ^botlist')
      end
     ImGui.SameLine()
     if ImGui.Button("Delete a Bot", ImVec2(buttonWidth, buttonSizeY)) then
@@ -54,9 +53,7 @@ function selectBotSubscreen.drawSelectBotSubscreen(gui)
         ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
 
         if ImGui.Button("Yes##deletebot", ImVec2(buttonWidth, buttonSizeY)) then
-            events.SetEventState("DeleteBot", true, function () return { data.GetBotNameList()[gui.botConfigSelectedBotIndex] } end)
-            events.SetEventState("refreshBotList", true)
-
+            events.SetButtonState("DeleteBot", true, function () return { data.GetBotNameList()[gui.botConfigSelectedBotIndex] } end)
             ImGui.CloseCurrentPopup()
         end
         ImGui.SameLine()

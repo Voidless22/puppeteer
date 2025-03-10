@@ -11,8 +11,7 @@ local function main()
     while Running do
         mq.doevents()
         mq.delay(10)
-        gui.ButtonStateManager()
-        events.EventStateManager()
+        events.ButtonStateManager()
     end
 end
 

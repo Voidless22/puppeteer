@@ -10,6 +10,12 @@ data.Compositions = {
     Groups = {},
     Raids = {}
 }
+data.GlobalDashbarButtons = {
+    
+}
+data.DefaultDashbarButtons = {
+    [1] = {Name = '1' }
+}
 
 function data.loadBotGroupConfigurations()
     local configData, err = loadfile(mq.configDir..'/puppeteer-groups-'..mq.TLO.Me.Name()..'.lua')
@@ -20,6 +26,17 @@ function data.loadBotGroupConfigurations()
         -- file loaded, put content into your config table
         data.Compositions.Groups = configData()
         for k,v in pairs(data.Compositions.Groups) do print(k,v) end
+    end
+end
+function data.loadPlayerGlobalDashbar()
+    local configData, err = loadfile(mq.configDir..'/puppeteer-globalDashbar-'..mq.TLO.Me.Name()..'.lua')
+    if err then
+        -- failed to read the config file, create it using pickle
+        mq.pickle('puppeteer-globalDashbar-'..mq.TLO.Me.Name()..'.lua', data.DefaultDashbarButtons)
+    elseif configData then
+        -- file loaded, put content into your config table
+        data.GlobalDashbarButtons = configData()
+        for k,v in pairs(data.GlobalDashbarButtons) do print(k,v) end
     end
 end
 
@@ -115,12 +132,11 @@ function data.GetBotNameList()
     return data.BotNameList
 end
 
-function data.refreshBotListButton()
+function data.ClearBotList()
     data.BotNameList = {}
     data.CharacterBots = {}
-    mq.cmd('/say ^botlist')
-    mq.delay(500)
-    mq.doevents()
 end
+
+
 
 return data

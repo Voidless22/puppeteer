@@ -222,19 +222,7 @@ function gui.ScreenManager()
         end
     end
 end
-gui.buttonStates = {
-    refreshBotList = { activated = false, guiButton = false, callback = data.refreshBotListButton },
-}
-function gui.ButtonStateManager()
-    for index, value in pairs(gui.buttonStates) do
-        if value ~= nil then
-            if value.activated and value.guiButton then
-                value.callback()
-                gui.buttonStates[index].activated = false
-            end
-        end
-    end
-end
+
 function gui.SetSelectedBot(botIndex)
     gui.botConfigSelectedBotIndex = botIndex
 end       
@@ -244,7 +232,6 @@ function gui.guiLoop()
         if showPuppeteer then
             ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
             gui.ScreenManager()
-            gui.ButtonStateManager()
         end
         ImGui.End()
     end

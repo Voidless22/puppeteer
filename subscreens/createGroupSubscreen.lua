@@ -191,7 +191,7 @@ function createGroupSubscreen.drawCreateGroupSubscreen(gui, selectedGroup)
     ImGui.NewLine()
     utils.CenterItem(200)
     if ImGui.Button("Spawn and Invite Group", ImVec2(200, 128)) then
-        events.SetEventState("SpawnBotGroup", true, function() return { projectedGroup } end)
+        events.SetButtonState("SpawnBotGroup", true, function() return { projectedGroup } end)
     end
 end
 

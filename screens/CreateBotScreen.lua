@@ -200,9 +200,9 @@ local function drawNameAndDetailsSection()
             end
             mq.cmdf("/say %s", createCmd)
             mq.cmdf("/say ^botspawn %s", createBotName)
-            events.SetEventState("SetBotTitle", true, function () return { createBotTitle, createBotName } end)
-            events.SetEventState("SetBotSuffix", true, function () return { createBotSuffix, createBotName } end)
-            events.SetEventState("SetBotLastName", true, function () return { createBotLastName, createBotName } end)
+            events.SetButtonState("SetBotTitle", true, function () return { createBotTitle, createBotName } end)
+            events.SetButtonState("SetBotSuffix", true, function () return { createBotSuffix, createBotName } end)
+            events.SetButtonState("SetBotLastName", true, function () return { createBotLastName, createBotName } end)
 
         else
             printf("Invalid or Missing Options Selected")
