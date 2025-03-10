@@ -10,37 +10,65 @@ data.Compositions = {
     Groups = {},
     Raids = {}
 }
-data.GlobalDashbarButtons = {
-    
-}
-data.DefaultDashbarButtons = {
-    [1] = {Name = '1' }
+data.DefaultDashbarButtons = {}
+data.GlobalDashbarButtons = {}
+
+local function defaultCallback(buttonNumber)
+    printf('Button %i pressed', buttonNumber)
+end
+
+-- Register callback functions in a table
+data.callbackRegistry = {
+    defaultCallback = defaultCallback
 }
 
+-- setup our defaults (temporary)
+for i = 1, 24 do
+    data.DefaultDashbarButtons[i] = {
+        Name = tostring(i),
+        activated = false,
+        callback = "defaultCallback", -- Store callback name as string
+        args = { tostring(i) }
+    }
+end
+
+function data.ToggleGlobalDashbarButton(button, state)
+    data.GlobalDashbarButtons[button].activated = state
+end
+
+function data.GetGlobalDashbarButtons()
+    return data.GlobalDashbarButtons
+end
+
 function data.loadBotGroupConfigurations()
-    local configData, err = loadfile(mq.configDir..'/puppeteer-groups-'..mq.TLO.Me.Name()..'.lua')
+    local configData, err = loadfile(mq.configDir .. '/puppeteer-groups-' .. mq.TLO.Me.Name() .. '.lua')
     if err then
         -- failed to read the config file, create it using pickle
-        mq.pickle('puppeteer-groups-'..mq.TLO.Me.Name()..'.lua', data.Compositions.Groups)
+        mq.pickle('puppeteer-groups-' .. mq.TLO.Me.Name() .. '.lua', data.Compositions.Groups)
     elseif configData then
         -- file loaded, put content into your config table
         data.Compositions.Groups = configData()
-        for k,v in pairs(data.Compositions.Groups) do print(k,v) end
+        for k, v in pairs(data.Compositions.Groups) do print(k, v) end
     end
 end
+
 function data.loadPlayerGlobalDashbar()
-    local configData, err = loadfile(mq.configDir..'/puppeteer-globalDashbar-'..mq.TLO.Me.Name()..'.lua')
+    local configData, err = loadfile(mq.configDir .. '/puppeteer-globalDashbar-' .. mq.TLO.Me.Name() .. '.lua')
     if err then
-        -- failed to read the config file, create it using pickle
-        mq.pickle('puppeteer-globalDashbar-'..mq.TLO.Me.Name()..'.lua', data.DefaultDashbarButtons)
+        -- Failed to read config file, create it using pickle
+        data.GlobalDashbarButtons = data.DefaultDashbarButtons
+        mq.pickle('puppeteer-globalDashbar-' .. mq.TLO.Me.Name() .. '.lua', data.DefaultDashbarButtons)
     elseif configData then
-        -- file loaded, put content into your config table
+        -- File loaded, put content into your config table
         data.GlobalDashbarButtons = configData()
-        for k,v in pairs(data.GlobalDashbarButtons) do print(k,v) end
+    end
+    -- Resolve callback strings to functions
+    for _, button in pairs(data.GlobalDashbarButtons) do
+        if type(button.callback) == "string" then
+            button.callback = data.callbackRegistry[button.callback]
+        end
     end
 end
-
-
 
 function data.initBotData(key, botData)
     if botData == nil then
@@ -94,14 +122,13 @@ end
 function data.GetGroupComposition(groupName)
     if groupName then
         if not data.Compositions.Groups[groupName] then
-            printf("Group: %s is missing.", groupName) 
+            printf("Group: %s is missing.", groupName)
         else
             return data.Compositions.Groups[groupName]
         end
     else
         return data.Compositions.Groups
     end
-
 end
 
 function data.GetGroupCompositionList()
@@ -136,7 +163,5 @@ function data.ClearBotList()
     data.BotNameList = {}
     data.CharacterBots = {}
 end
-
-
 
 return data

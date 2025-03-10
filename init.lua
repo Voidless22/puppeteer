@@ -26,6 +26,7 @@ end
 
 initEvents()
 data.loadBotGroupConfigurations()
+data.loadPlayerGlobalDashbar()
 mq.bind("/puppeteer", gui.ToggleWindowShow)
 mq.imgui.init("Puppeteer", gui.guiLoop)
 main()

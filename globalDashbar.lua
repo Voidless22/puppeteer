@@ -1,5 +1,6 @@
 local mq = require('mq')
 local imgui = require('ImGui')
+local data  = require('data')
 local globalDashbar = {}
 
 local buttonOuterPadding = 8
@@ -21,12 +22,8 @@ default global buttons - default to spawned unless valid target for actionables
 ]] 
 
 
-local defaultButtonTable = {}
-for i = 1, totalButtonsPerPage do
-    defaultButtonTable[i] = { Name = string.format("%s", i), callback = defaultButtonPressed, args = { string.format("%s", i) } }
-end
 
-local buttonTable = defaultButtonTable
+local buttonTable = data.GetGlobalDashbarButtons()
 
 function globalDashbar.ButtonStateManager()
     for index, value in pairs(buttonTable) do
@@ -42,6 +39,7 @@ function globalDashbar.ButtonStateManager()
 end
 
 local function drawButtonGrid()
+    buttonTable = data.GetGlobalDashbarButtons()
     local windowWidth = ImGui.GetWindowSizeVec().x
     local columnCount = math.floor((windowWidth - (buttonOuterPadding * 2)) / (minButtonSize + buttonSpacing))
     local rowCount = math.ceil(totalButtonsPerPage / columnCount)  -- Calculate the number of rows correctly
@@ -52,12 +50,12 @@ local function drawButtonGrid()
     if ImGui.GetWindowSizeVec().y > totalRowSize then
         ImGui.SetWindowSize(ImGui.GetWindowSizeVec().x, totalRowSize)
     end
-    
     for index, value in ipairs(buttonTable) do
         local prevCursorPos = ImGui.GetCursorPosVec()
         
         if ImGui.Button(value.Name, ImVec2(minButtonSize, minButtonSize)) then
             printf("Button: %s Selected", value.Name)
+            data.ToggleGlobalDashbarButton(index, true)
         end
 
         if currentColumn < columnCount then

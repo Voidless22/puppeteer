@@ -32,7 +32,6 @@ local function deleteBotButtonCallback(botName)
     end
 end
 
-
 local function SetBotLastNameButtonCallback(botLastName, botName)
     if botLastName == '' then return end
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
@@ -122,7 +121,6 @@ end
 
 
 
-
 function events.getBotList(line, botIndex, botName, botLevel, botGender, botDetails)
     local race = utils.findMatchInTable(botDetails, utils.Races)
     local class = utils.findMatchInTable(botDetails, utils.Classes)
@@ -174,6 +172,18 @@ function events.ButtonStateManager()
                     value.callback()
                 end
                 events.buttonStates[index].activated = false
+            end
+        end
+    end
+    for index, value in pairs(data.GetGlobalDashbarButtons()) do
+        if value ~= nil then
+            if value.activated then
+                if value.args ~= nil then
+                    value.callback(unpack(value.args))
+                else
+                    value.callback()
+                end
+                data.ToggleGlobalDashbarButton(index, false)
             end
         end
     end
