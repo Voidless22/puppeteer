@@ -49,7 +49,7 @@ function selectBotSubscreen.drawSelectBotSubscreen(gui)
     if ImGui.BeginPopupModal("Delete Bot?", nil, bit32.bor(ImGuiWindowFlags.NoResize, ImGuiWindowFlags.NoMove)) then
         utils.CenterText("Are you sure you want to delete this bot?")
         utils.CenterText(data.GetBotNameList()[gui.botConfigSelectedBotIndex])
-        local startPoint = (ImGui.GetWindowSizeVec().x - selectBotComboWidth) / 2
+        local startPoint = (ImGui.GetWindowSizeVec().x  / 2) - (buttonWidth + 2 * 2)
         ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
 
         if ImGui.Button("Yes##deletebot", ImVec2(buttonWidth, buttonSizeY)) then
