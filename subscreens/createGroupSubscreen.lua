@@ -17,6 +17,19 @@ local includeSelfInProjectedGrp = false
 local lastModifiedGroupIndex = nil
 
 
+local function saveGroupData(gui, groupName, projectedGroup,noReturn)
+    -- let's save it in our groups table
+    data.SetGroupComposition(groupName, projectedGroup)
+    -- then write the entire groups table again
+    mq.pickle('puppeteer-groups-' .. mq.TLO.Me.Name() .. '.lua', data.GetGroupComposition())
+    -- clear index slates and go back to select
+    if not noReturn then
+    gui.clearGroupManagementSelections()
+    gui.SetActiveSubscreen("SelectGroup")
+    end
+end
+
+
 local function prepGroupData(gui, selectedGroup)
     -- clean the slate for projected group
     projectedGroup = {}
@@ -28,23 +41,25 @@ local function prepGroupData(gui, selectedGroup)
         lastModifiedGroupIndex = gui.selectedGroupIndex
     end
     -- okay, since this group was already made, am I in here? let's flip that switch if I am.
-    for _, value in ipairs(projectedGroup) do
+    -- While we're at it, we need to make sure all the bots in this group actually still exist.
+    for index, value in ipairs(projectedGroup) do
+        local botFound = false
         if value == mq.TLO.Me.Name() then
             includeSelfInProjectedGrp = true
         end
+        for _, botEntry in ipairs(data.GetBotNameList()) do
+            if botEntry == value then
+                botFound = true
+            end
+        end
+        if not botFound and value ~= mq.TLO.Me.Name() then
+            printf(
+            "The following bot: [%s] was not found in the available bot list, and will be removed from the group.", value)
+            table.remove(projectedGroup, index)
+            saveGroupData(gui, groupName, projectedGroup)
+        end
     end
 end
-
-local function saveGroupData(gui, groupName, projectedGroup)
-    -- let's save it in our groups table
-    data.SetGroupComposition(groupName, projectedGroup)
-    -- then write the entire groups table again
-    mq.pickle('puppeteer-groups-'.. mq.TLO.Me.Name() ..'.lua', data.GetGroupComposition())
-    -- clear index slates and go back to select
-    gui.clearGroupManagementSelections()
-    gui.SetActiveSubscreen("SelectGroup")
-end
-
 
 
 function createGroupSubscreen.drawCreateGroupSubscreen(gui, selectedGroup)

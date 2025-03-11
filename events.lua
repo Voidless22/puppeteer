@@ -27,8 +27,8 @@ local function deleteBotButtonCallback(botName)
         mq.delay(1000)
         mq.cmdf('/say ^botdelete confirm')
         mq.delay(250)
+        data.ClearBotList()
         mq.cmdf('/say ^botlist')
-
     end
 end
 
@@ -178,12 +178,28 @@ function events.ButtonStateManager()
     for index, value in pairs(data.GetGlobalDashbarButtons()) do
         if value ~= nil then
             if value.activated then
-                if value.args ~= nil then
-                    value.callback(unpack(value.args))
+                if value.toggleState ~= nil then
+                    if value.toggleState == false and value.negativeCallback ~= nil then
+                        if value.negativeArgs ~= nil then
+                            value.negativeCallback(unpack(value.negativeArgs()))
+                        else
+                            value.negativeCallback()
+                        end
+                    elseif value.toggleState == true and value.positiveCallback ~= nil then
+                        if value.positiveArgs ~= nil then
+                            value.positiveCallback(unpack(value.positiveArgs()))
+                        else
+                            value.positiveCallback()
+                        end
+                    end
                 else
-                    value.callback()
+                    if value.args ~= nil then
+                        value.callback(unpack(value.args()))
+                    else
+                        value.callback()
+                    end
                 end
-                data.ToggleGlobalDashbarButton(index, false)
+                data.ActivateGlobalDashbarButton(index, false)
             end
         end
     end

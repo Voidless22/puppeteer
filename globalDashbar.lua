@@ -1,68 +1,82 @@
-local mq = require('mq')
-local imgui = require('ImGui')
-local data  = require('data')
-local globalDashbar = {}
+local mq                 = require('mq')
+local imgui              = require('ImGui')
+local data               = require('data')
+local globalDashbar      = {}
 
 local buttonOuterPadding = 8
-local minButtonSize = 48
-local buttonSpacing = 8
-local totalButtonsPerPage = 24
-
-local function defaultButtonPressed(buttonName)
-    printf("Button Pressed")
-end
-
---[[
-default global buttons - default to spawned unless valid target for actionables
-- attack spawned
-- hold attacks (need to setup as toggle, on disable call release spawned)
-- botsummon target or spawned
-- follow target or self (need to setup as toggle, on disable call follow off or whatever)
-
-]] 
-
-
-
-local buttonTable = data.GetGlobalDashbarButtons()
-
-function globalDashbar.ButtonStateManager()
-    for index, value in pairs(buttonTable) do
-        if value ~= nil then
-            if value.activated and value.guiButton then
-                if value.args ~= nil then
-                    value.callback(unpack(value.args))
-                end
-                value.callback()
-            end
-        end
-    end
-end
-
+local minButtonSize      = 48
+local buttonSpacing      = 8
+local buttonTable        = data.GetGlobalDashbarButtons()
+local outerPaddingX      = 16
+local outerPaddingY      = 34
+local scrollPadBuffer    = 8
 local function drawButtonGrid()
     buttonTable = data.GetGlobalDashbarButtons()
-    local windowWidth = ImGui.GetWindowSizeVec().x
-    local columnCount = math.floor((windowWidth - (buttonOuterPadding * 2)) / (minButtonSize + buttonSpacing))
-    local rowCount = math.ceil(totalButtonsPerPage / columnCount)  -- Calculate the number of rows correctly
-    local totalRowSize = (buttonOuterPadding * 4) + ((minButtonSize + buttonSpacing) * rowCount)  -- Total height of all rows
+    local drawlist = ImGui.GetWindowDrawList()
+    local columnCount = math.floor((ImGui.GetWindowSizeVec().x - (buttonOuterPadding * 1.5)) /
+        (minButtonSize + buttonSpacing))
+    local rowCount = math.ceil(#buttonTable / columnCount) -- Calculate the number of rows correctly
+
     local currentColumn = 1
-    
+    ImGui.SetCursorPos(outerPaddingX, outerPaddingY)
     -- Set the window size to fit the total height needed for the grid
-    if ImGui.GetWindowSizeVec().y > totalRowSize then
-        ImGui.SetWindowSize(ImGui.GetWindowSizeVec().x, totalRowSize)
+    if ImGui.GetWindowSizeVec().y > minButtonSize * rowCount + (outerPaddingY * 2) + scrollPadBuffer then
+        ImGui.SetWindowSize(ImGui.GetWindowSizeVec().x,
+            rowCount * (minButtonSize + buttonSpacing) + outerPaddingY + scrollPadBuffer)
     end
+
+
+
     for index, value in ipairs(buttonTable) do
         local prevCursorPos = ImGui.GetCursorPosVec()
-        
-        if ImGui.Button(value.Name, ImVec2(minButtonSize, minButtonSize)) then
-            printf("Button: %s Selected", value.Name)
-            data.ToggleGlobalDashbarButton(index, true)
+        local prevScreenCursorPos = ImGui.GetCursorScreenPosVec()
+        -- Capture the draw list to overlay custom visuals
+        local drawList = ImGui.GetWindowDrawList()
+        -- toggle drawlist locs
+        local buttonMin = prevScreenCursorPos
+        local buttonMax = ImVec2(prevScreenCursorPos.x + minButtonSize, prevScreenCursorPos.y + minButtonSize)
+
+        local buttonLabel = value.Name .. '##' .. index
+        -- if the text won't fit in the button, empty the label for later
+        if ImGui.CalcTextSizeVec(value.Name).x > minButtonSize then
+            buttonLabel = "##" .. value.Name .. index
+        end
+
+        -- now we actually add the button
+        if ImGui.Button(buttonLabel, ImVec2(minButtonSize, minButtonSize)) then
+            if value.toggleState ~= nil then
+                data.FlipToggleButtonState(index)
+            end
+            data.ActivateGlobalDashbarButton(index, true)
+        end
+
+
+        -- if we have an empty label that means we need to wrap it
+        if buttonLabel == "##" .. value.Name .. index then
+            ImGui.SetCursorPos(prevCursorPos)
+            local labelSize = ImGui.CalcTextSizeVec(value.Name, false, minButtonSize)
+            local buttonCenter = ImGui.GetCursorPosVec() + ImVec2(minButtonSize / 2, minButtonSize / 2)
+            ImGui.SetCursorPos(buttonCenter - (labelSize / 2))
+            ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + minButtonSize)
+            ImGui.TextWrapped(value.Name)
+        end
+
+        -- Draw the semi-transparent overlay only if toggleState exists
+        if value.toggleState ~= nil then
+            local overlayColor = value.toggleState and ImVec4(0, 1, 0, 0.3) or ImVec4(1, 0, 0, 0.3)
+            drawList:AddRectFilled(buttonMin, buttonMax, ImGui.GetColorU32(overlayColor), 0)
+        end
+
+        if value.tooltip ~= nil then
+            ImGui.SetItemTooltip(value.tooltip)
         end
 
         if currentColumn < columnCount then
-            ImGui.SameLine(0, buttonSpacing)
+            ImGui.SetCursorPosX(prevCursorPos.x + (minButtonSize + buttonSpacing))
+            ImGui.SetCursorPosY(prevCursorPos.y)
             currentColumn = currentColumn + 1
         else
-            ImGui.NewLine()
+            ImGui.SetCursorPosX(outerPaddingX)
             ImGui.SetCursorPosY(prevCursorPos.y + (minButtonSize + buttonSpacing))
             currentColumn = 1
         end
@@ -70,7 +84,6 @@ local function drawButtonGrid()
 end
 function globalDashbar.DrawGlobalDashbar(gui)
     drawButtonGrid()
-    globalDashbar.ButtonStateManager()
 end
 
 return globalDashbar
