@@ -1,35 +1,36 @@
-local mq                           = require('mq')
-local imgui                        = require('ImGui')
-local data                         = require('data')
-local utils                        = require('utils')
-local globalDashbar                = require('globalDashbar')
+local mq                                         = require('mq')
+local imgui                                      = require('ImGui')
+local data                                       = require('data')
+local utils                                      = require('utils')
+local globalDashbar                              = require('globalDashbar')
 
 -- Screens
-local welcomeScreen                = require('screens/welcomeScreen')
-local botManagementScreen          = require('screens/botManagementScreen')
-local dashboardScreen              = require('screens/dashboardScreen')
-local CreateBotScreen              = require('screens/CreateBotScreen')
-local GroupManagementScreen        = require('screens/GroupManagementScreen')
+local welcomeScreen                              = require('screens/welcomeScreen')
+local botManagementScreen                        = require('screens/botManagementScreen')
+local dashboardScreen                            = require('screens/dashboardScreen')
+local CreateBotScreen                            = require('screens/CreateBotScreen')
+local GroupManagementScreen                      = require('screens/GroupManagementScreen')
 
 -- Subscreens
-local selectBotSubscreen           = require('subscreens/selectBotSubscreen')
-local botConfigurationSubscreen    = require('subscreens/botConfigurationSubscreen')
-local selectGroupSubscreen         = require('subscreens/selectGroupSubscreen')
-local createGroupSubscreen         = require('subscreens/createGroupSubscreen')
+local selectBotSubscreen                         = require('subscreens/selectBotSubscreen')
+local botConfigurationSubscreen                  = require('subscreens/botConfigurationSubscreen')
+local selectGroupSubscreen                       = require('subscreens/selectGroupSubscreen')
+local createGroupSubscreen                       = require('subscreens/createGroupSubscreen')
 
-local gui                          = {}
+local gui                                        = {}
 
-local openPuppeteer, showPuppeteer = true, true
-local openGlobalDashbar, showGlobalDashbar = false,true
+local openPuppeteer, showPuppeteer               = true, true
+local openGlobalDashbar, showGlobalDashbar       = false, true
+local openPossibleUpgrades, showPossibleUpgrades = false, true
+gui.botConfigSelectedBotIndex                    = 0
+gui.selectedGroupIndex                           = 0
+gui.selectedGroupName                            = nil
 
-gui.botConfigSelectedBotIndex      = 0
-gui.selectedGroupIndex             = 0
-gui.selectedGroupName              = nil
+local FLT_MIN, FLT_MAX                           = mq.NumericLimits_Float()
 
+gui.windowSize                                   = ImVec2(512, 768)
 
-gui.windowSize        = ImVec2(512, 768)
-
-gui.previousSubscreen = ''
+gui.previousSubscreen                            = ''
 
 
 gui.Screens = {
@@ -79,18 +80,16 @@ gui.Subscreens = {
 }
 
 function gui.clearGroupManagementSelections()
-    gui.selectedGroupIndex             = 0
-    gui.selectedGroupName              = nil
-    
+    gui.selectedGroupIndex = 0
+    gui.selectedGroupName  = nil
 end
 
 function gui.ToggleShowGlobalDashbar()
     openGlobalDashbar = not openGlobalDashbar
 end
 
-
 function gui.DrawGlobalDashbarWindow()
-    if openGlobalDashbar then  -- Only try to render if the window should be shown
+    if openGlobalDashbar then -- Only try to render if the window should be shown
         openGlobalDashbar, showGlobalDashbar = ImGui.Begin("Global Dashbar", openGlobalDashbar)
         if showGlobalDashbar then
             globalDashbar.DrawGlobalDashbar(gui)
@@ -99,7 +98,77 @@ function gui.DrawGlobalDashbarWindow()
     end
 end
 
+function gui.drawItemUpgradesPopup()
+    local buttonWidth = 96
+    local buttonSizeY = 48
+    local wndSize = ImVec2(512, 512)
+    local viewport = ImGui.GetMainViewport()
+    local center = viewport.Pos + (viewport.Size * 0.5) - (wndSize / 2)
 
+    ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, ImVec2(0.5, 0.5)) -- Centered
+    --ImGui.SetNextWindowSizeConstraints(ImVec2(200, 0), ImVec2(FLT_MAX, FLT_MAX))
+    openPossibleUpgrades, showPossibleUpgrades = ImGui.Begin("Possible Upgrades", openPossibleUpgrades,
+        bit32.bor(ImGuiWindowFlags.NoResize))
+    if showPossibleUpgrades then
+        ImGui.SetWindowPos((viewport.Size / 2) - wndSize / 2, ImGuiCond.Once)
+        ImGui.SetWindowSize(512, 512, ImGuiCond.Once)
+        utils.CenterText("Potential Gear Upgrades")
+        utils.BetterNewLine(10)
+        if imgui.BeginTable('##potentialUpgrades', 5, ImGuiTableFlags.Borders) then
+            imgui.TableSetupColumn('Bot')
+            imgui.TableSetupColumn('Slot')
+            imgui.TableSetupColumn('Current Item')
+            imgui.TableSetupColumn('Projected Item')
+            imgui.TableSetupColumn("Swap Item")
+            imgui.TableSetupScrollFreeze(0, 1) -- Make row always visible
+
+            -- Display data
+            imgui.TableHeadersRow()
+            local botData = data.GetBotData()
+            for index, value in ipairs(data.GetPotentialBotItemUpgrades()) do
+                imgui.TableNextRow()
+                imgui.TableNextColumn()
+                imgui.Text(value.botName)
+                imgui.TableNextColumn()
+                imgui.Text(value.itemSlot)
+                imgui.TableNextColumn()
+                if imgui.SmallButton('Inspect##Current' .. index) then
+                    local links = mq.ExtractLinks(value.line)
+                    mq.ExecuteTextLink(links[2])
+                end
+                imgui.TableNextColumn()
+                if imgui.SmallButton('Inspect##Projected' .. index) then
+                    --  local projectedItem = mq.TLO.FindItem(value.upgradeItem).ItemLink('CLICKABLE')()
+                    --if projectedItem then
+                    --local projectedItemLink = mq.ExtractLinks(projectedItem)
+                    --mq.ExecuteTextLink(projectedItemLink[1])
+                    mq.TLO.FindItem(value.upgradeItem).Inspect()
+                    --end
+                end
+                ImGui.TableNextColumn()
+                if ImGui.SmallButton('Swap##' .. index) then
+                    if not mq.TLO.Cursor() then
+                        local packSlot = mq.TLO.FindItem(value.upgradeItem).ItemSlot()
+                        local subSlot = mq.TLO.FindItem(value.upgradeItem).ItemSlot2()
+                        print(packSlot)
+                        print(subSlot)
+                        mq.cmdf('/itemnotify in pack%i %i leftmouseup', (packSlot-22), (subSlot + 1))
+                    end
+                    mq.cmdf('/say ^ig byname %s', value.botName)
+                end
+            end
+            imgui.EndTable()
+        end
+        ImGui.NewLine()
+        ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (buttonWidth / 2))
+        if ImGui.Button("All Done!##closeupgradepopup", ImVec2(buttonWidth, buttonSizeY)) then
+            data.ClearPotentialBotItemUpgrades()
+            ImGui.CloseCurrentPopup()
+        end
+
+        ImGui.End()
+    end
+end
 
 function gui.ToggleWindowShow()
     openPuppeteer = not openPuppeteer
@@ -126,6 +195,7 @@ function gui.GetActiveScreen()
     end
     return nil -- No active screen found
 end
+
 function gui.SetActiveScreen(screenName)
     -- step one is clear the subscreens.
     for name, subscreen in pairs(gui.Subscreens) do
@@ -160,6 +230,7 @@ function gui.SetActiveScreen(screenName)
         printf("Missing Screen: %s", screenName)
     end
 end
+
 function gui.SetActiveSubscreen(subscreenName)
     -- same deal as screens, clear the slate and disable all of them.
     for name, subscreen in pairs(gui.Subscreens) do
@@ -190,6 +261,7 @@ function gui.SetActiveSubscreen(subscreenName)
         end
     end
 end
+
 function gui.ScreenManager()
     -- Find and draw the active screen
     for name, screen in pairs(gui.Screens) do
@@ -225,16 +297,24 @@ end
 
 function gui.SetSelectedBot(botIndex)
     gui.botConfigSelectedBotIndex = botIndex
-end       
+end
+
 function gui.guiLoop()
-    if openPuppeteer then  -- Only try to render if the window should be shown
+    if openPuppeteer then -- Only try to render if the window should be shown
         openPuppeteer, showPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
+        local potentialUpgrades = data.GetPotentialBotItemUpgrades()
+        local doShowUpgradePopup = #potentialUpgrades > 0
+
         if showPuppeteer then
             ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
             gui.ScreenManager()
         end
+        if doShowUpgradePopup then
+            gui.drawItemUpgradesPopup()
+        end
         ImGui.End()
     end
+
     gui.DrawGlobalDashbarWindow()
 end
 

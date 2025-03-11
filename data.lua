@@ -11,6 +11,20 @@ data.Compositions = {
     Groups = {},
     Raids = {}
 }
+
+data.potentialBotItemUpgrades = {}
+
+
+function data.AddToPotentialBotItemUpgrades(itemData)
+    table.insert(data.potentialBotItemUpgrades, itemData)
+end
+function data.ClearPotentialBotItemUpgrades()
+    data.potentialBotItemUpgrades = {}
+end
+function data.GetPotentialBotItemUpgrades()
+    return data.potentialBotItemUpgrades
+end
+
 data.GlobalDashbarButtons = {}
 
 data.DefaultDashbarButtons = {
@@ -76,12 +90,9 @@ function data.GetCallbackRegistry()
     return callbackRegistry
 end
 
-
 function data.ResetGlobalDashbar()
     data.GlobalDashbarButtons = data.DefaultDashbarButtons
     mq.pickle('puppeteer-globalDashbar-' .. mq.TLO.Me.Name() .. '.lua', data.DefaultDashbarButtons)
-
-    
 end
 
 function data.ActivateGlobalDashbarButton(button, state)

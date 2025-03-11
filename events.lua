@@ -139,6 +139,19 @@ function events.getBotList(line, botIndex, botName, botLevel, botGender, botDeta
     })
 end
 
+function events.ItemUpgradeMsgEvent(line, name, itemSlot, currentBotItemLink)
+    local botDataIndex
+    local msgLinks = mq.ExtractLinks(line)
+    local botName = mq.ParseDialogLink(name).text
+    for index, value in ipairs(data.GetBotData()) do
+        if botName == value.Name then
+            printf('found bot')
+            botDataIndex = index
+        end
+    end
+    data.AddToPotentialBotItemUpgrades({ botName = botName, upgradeItem = mq.TLO.Cursor.ID(), itemSlot = itemSlot, itemName = msgLinks[2].text, line = line })
+end
+
 function events.GetButtonState(button)
     if button ~= nil then
         return events.buttonStates[button]
