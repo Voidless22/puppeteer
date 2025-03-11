@@ -155,6 +155,9 @@ function gui.drawItemUpgradesPopup()
                         mq.cmdf('/itemnotify in pack%i %i leftmouseup', (packSlot-22), (subSlot + 1))
                     end
                     mq.cmdf('/say ^ig byname %s', value.botName)
+                    data.ClearPotentialBotItemUpgrades()
+                    ImGui.CloseCurrentPopup()
+                    
                 end
             end
             imgui.EndTable()
