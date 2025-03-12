@@ -304,19 +304,21 @@ function gui.SetSelectedBot(botIndex)
 end
 
 function gui.guiLoop()
+    local potentialUpgrades = data.GetPotentialBotItemUpgrades()
+    local doShowUpgradePopup = #potentialUpgrades > 0
+
     if openPuppeteer then -- Only try to render if the window should be shown
         openPuppeteer, showPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
-        local potentialUpgrades = data.GetPotentialBotItemUpgrades()
-        local doShowUpgradePopup = #potentialUpgrades > 0
 
         if showPuppeteer then
             ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
             gui.ScreenManager()
         end
-        if doShowUpgradePopup then
-            gui.drawItemUpgradesPopup()
-        end
+      
         ImGui.End()
+    end
+    if doShowUpgradePopup then
+        gui.drawItemUpgradesPopup()
     end
 
     gui.DrawGlobalDashbarWindow()

@@ -7,7 +7,7 @@ local buttonCallbacks = {}
 
 buttonCallbacks.callbackRegistry = {}
 
-local function SetBotTitleButtonCallback(botTitle, botName)
+ function buttonCallbacks.SetBotTitleButtonCallback(botTitle, botName)
     if botTitle == '' then return end
 
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
@@ -18,7 +18,7 @@ local function SetBotTitleButtonCallback(botTitle, botName)
     end
 end
 
-local function deleteBotButtonCallback(botName)
+ function buttonCallbacks.deleteBotButtonCallback(botName)
     if not mq.TLO.Spawn(botName)() then
         mq.cmdf('/say ^botspawn %s', botName)
         mq.delay(10000, function() return mq.TLO.Spawn(botName)() end)
@@ -35,7 +35,7 @@ local function deleteBotButtonCallback(botName)
     end
 end
 
-local function SetBotLastNameButtonCallback(botLastName, botName)
+ function buttonCallbacks.SetBotLastNameButtonCallback(botLastName, botName)
     if botLastName == '' then return end
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
     if mq.TLO.Spawn(botName)() then
@@ -45,7 +45,7 @@ local function SetBotLastNameButtonCallback(botLastName, botName)
     end
 end
 
-local function SetBotSuffixButtonCallback(botSuffix, botName)
+ function buttonCallbacks.SetBotSuffixButtonCallback(botSuffix, botName)
     if botSuffix == '' then return end
     mq.delay(5000, function() return mq.TLO.Spawn(botName)() end)
     if mq.TLO.Spawn(botName)() then
@@ -55,7 +55,7 @@ local function SetBotSuffixButtonCallback(botSuffix, botName)
     end
 end
 
-local function spawnBotGroupButtonCallback(groupMembers)
+ function buttonCallbacks.spawnBotGroupButtonCallback(groupMembers)
     local raidUnlocked = false
     local foundEmptyGroup = false
     local raidGroupCount = 12
