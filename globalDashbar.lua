@@ -1,6 +1,7 @@
 local mq                 = require('mq')
 local imgui              = require('ImGui')
 local data               = require('data')
+local buttonState        = require('buttonState')
 local globalDashbar      = {}
 
 local buttonOuterPadding = 8
@@ -45,10 +46,11 @@ local function drawButtonGrid()
         -- now we actually add the button
         if ImGui.Button(buttonLabel, ImVec2(minButtonSize, minButtonSize)) then
             if value.toggleState ~= nil then
-                data.FlipToggleButtonState(index)
+                buttonState.FlipToggle(index..'-DashbarBtn')
             end
-            data.ActivateGlobalDashbarButton(index, true)
+            buttonState.SetButtonState(index..'-DashbarBtn', true)
         end
+
 
 
         -- if we have an empty label that means we need to wrap it

@@ -1,7 +1,7 @@
 local mq = require('mq')
 local imgui = require('ImGui')
 local utils = require('utils')
-local events = require('events')
+local buttonState = require('buttonState')
 local createBotScreen = {}
 local botCreateSelectedRace = ''
 local botCreateSelectedClass = ''
@@ -200,9 +200,9 @@ local function drawNameAndDetailsSection()
             end
             mq.cmdf("/say %s", createCmd)
             mq.cmdf("/say ^botspawn %s", createBotName)
-            events.SetButtonState("SetBotTitle", true, function () return { createBotTitle, createBotName } end)
-            events.SetButtonState("SetBotSuffix", true, function () return { createBotSuffix, createBotName } end)
-            events.SetButtonState("SetBotLastName", true, function () return { createBotLastName, createBotName } end)
+            buttonState.SetButtonState("SetBotTitle", true, function () return { createBotTitle, createBotName } end)
+            buttonState.SetButtonState("SetBotSuffix", true, function () return { createBotSuffix, createBotName } end)
+            buttonState.SetButtonState("SetBotLastName", true, function () return { createBotLastName, createBotName } end)
 
         else
             printf("Invalid or Missing Options Selected")

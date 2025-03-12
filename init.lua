@@ -4,6 +4,7 @@ local utils   = require('utils')
 local events  = require('events')
 local data    = require('data')
 local gui     = require('gui')
+local buttonState = require('buttonState')
 local Running = true
 
 
@@ -11,7 +12,8 @@ local function main()
     while Running do
         mq.doevents()
         mq.delay(10)
-        events.ButtonStateManager()
+       -- events.ButtonStateManager()
+       buttonState.StateManager()
     end
 end
 
@@ -29,6 +31,8 @@ end
 initEvents()
 data.loadBotGroupConfigurations()
 data.loadPlayerGlobalDashbar()
+buttonState.InitDashbarButtons()
+buttonState.ConnectDashbarCallbacks()
 mq.bind("/puppeteer", gui.ToggleWindowShow)
 mq.bind('/defaultglobaldash', data.ResetGlobalDashbar)
 mq.imgui.init("Puppeteer", gui.guiLoop)

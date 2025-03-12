@@ -17,6 +17,7 @@ local botConfigurationSubscreen                  = require('subscreens/botConfig
 local selectGroupSubscreen                       = require('subscreens/selectGroupSubscreen')
 local createGroupSubscreen                       = require('subscreens/createGroupSubscreen')
 
+local buttonState = require('buttonState')
 local gui                                        = {}
 
 local openPuppeteer, showPuppeteer               = true, true

@@ -3,6 +3,7 @@ local imgui                 = require('ImGui')
 local utils                 = require('utils')
 local data                  = require('data')
 local events                = require('events')
+local buttonState           = require('buttonState')
 local selectGroupSubscreen  = {}
 
 local FLT_MIN, FLT_MAX      = mq.NumericLimits_Float()
@@ -70,7 +71,7 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
 
     if ImGui.Button("Spawn + Invite Group", ImVec2(buttonWidth, buttonSizeY)) and gui.selectedGroupIndex ~= 0 then
         gui.selectedGroupName = data.GetGroupCompositionList()[gui.selectedGroupIndex]
-        events.SetButtonState("SpawnBotGroup", true,
+        buttonState.SetButtonState("SpawnBotGroup", true,
             function() return { data.GetGroupComposition(gui.selectedGroupName) } end)
     end
     ImGui.SameLine()

@@ -3,6 +3,7 @@ local imgui = require('ImGui')
 local utils = require('utils')
 local data = require('data')
 local events = require('events')
+local buttonState = require('buttonState')
 local createGroupSubscreen = {}
 
 local groupName
@@ -206,7 +207,7 @@ function createGroupSubscreen.drawCreateGroupSubscreen(gui, selectedGroup)
     ImGui.NewLine()
     utils.CenterItem(200)
     if ImGui.Button("Spawn and Invite Group", ImVec2(200, 128)) then
-        events.SetButtonState("SpawnBotGroup", true, function() return { projectedGroup } end)
+        buttonState.SetButtonState("SpawnBotGroup", true, function() return { projectedGroup } end)
     end
 end
 

@@ -1,6 +1,5 @@
 local mq = require('mq')
 
-local globalDashbarCallbacks = require('globalDashbarCallbacks')
 
 local data = {}
 
@@ -13,18 +12,6 @@ data.Compositions = {
 }
 
 data.potentialBotItemUpgrades = {}
-
-
-function data.AddToPotentialBotItemUpgrades(itemData)
-    table.insert(data.potentialBotItemUpgrades, itemData)
-end
-function data.ClearPotentialBotItemUpgrades()
-    data.potentialBotItemUpgrades = {}
-end
-function data.GetPotentialBotItemUpgrades()
-    return data.potentialBotItemUpgrades
-end
-
 data.GlobalDashbarButtons = {}
 
 data.DefaultDashbarButtons = {
@@ -75,37 +62,29 @@ data.DefaultDashbarButtons = {
         tooltip = 'Checks all spawned bots if the item held on cursor is an ugprade.'
     }
 }
-local callbackRegistry = {}
-callbackRegistry.defaultCallback = globalDashbarCallbacks.EmptyCallback
-callbackRegistry.SpawnedAtkCallback = globalDashbarCallbacks.SpawnedBotsAttackCallback
-callbackRegistry.BackOffCallback = globalDashbarCallbacks.BackOffCallback
-callbackRegistry.SetupCampCallback = globalDashbarCallbacks.SetupCampCallback
-callbackRegistry.ClearCampCallback = globalDashbarCallbacks.ClearCampCallback
-callbackRegistry.EnableAutoDefendCallback = globalDashbarCallbacks.EnableAutoDefendCallback
-callbackRegistry.DisableAutoDefendCallback = globalDashbarCallbacks.DisableAutoDefendCallback
-callbackRegistry.SummonBotsCallback = globalDashbarCallbacks.SummonBotsCallback
-callbackRegistry.CheckBotUpgradesCallback = globalDashbarCallbacks.CheckBotUpgradesCallback
 
-function data.GetCallbackRegistry()
-    return callbackRegistry
+
+
+function data.AddToPotentialBotItemUpgrades(itemData)
+    table.insert(data.potentialBotItemUpgrades, itemData)
 end
+function data.ClearPotentialBotItemUpgrades()
+    data.potentialBotItemUpgrades = {}
+end
+function data.GetPotentialBotItemUpgrades()
+    return data.potentialBotItemUpgrades
+end
+
+
 
 function data.ResetGlobalDashbar()
     data.GlobalDashbarButtons = data.DefaultDashbarButtons
     mq.pickle('puppeteer-globalDashbar-' .. mq.TLO.Me.Name() .. '.lua', data.DefaultDashbarButtons)
 end
-
-function data.ActivateGlobalDashbarButton(button, state)
-    data.GlobalDashbarButtons[button].activated = state
-end
-
-function data.FlipToggleButtonState(button)
-    data.GlobalDashbarButtons[button].toggleState = not data.GlobalDashbarButtons[button].toggleState
-end
-
 function data.GetGlobalDashbarButtons()
     return data.GlobalDashbarButtons
 end
+
 
 function data.loadBotGroupConfigurations()
     local configData, err = loadfile(mq.configDir .. '/puppeteer-groups-' .. mq.TLO.Me.Name() .. '.lua')
@@ -129,19 +108,8 @@ function data.loadPlayerGlobalDashbar()
         -- File loaded, put content into your config table
         data.GlobalDashbarButtons = configData()
     end
-    -- Resolve callback strings to functions
-    for _, button in pairs(data.GlobalDashbarButtons) do
-        if type(button.callback) == "string" then
-            button.callback = callbackRegistry[button.callback]
-        end
-        if type(button.negativeCallback) == "string" then
-            button.negativeCallback = callbackRegistry[button.negativeCallback]
-        end
-        if type(button.positiveCallback) == "string" then
-            button.positiveCallback = callbackRegistry[button.positiveCallback]
-        end
-    end
 end
+
 
 function data.initBotData(key, botData)
     if botData == nil then

@@ -3,6 +3,7 @@ local imgui               = require('ImGui')
 local utils               = require('utils')
 local data                = require('data')
 local events              = require('events')
+local buttonState         = require('buttonState')
 local selectBotSubscreen  = {}
 local selectBotComboWidth = 350
 local FLT_MIN, FLT_MAX    = mq.NumericLimits_Float()
@@ -53,7 +54,7 @@ function selectBotSubscreen.drawSelectBotSubscreen(gui)
         ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
 
         if ImGui.Button("Yes##deletebot", ImVec2(buttonWidth, buttonSizeY)) then
-            events.SetButtonState("DeleteBot", true, function () return { data.GetBotNameList()[gui.botConfigSelectedBotIndex] } end)
+            buttonState.SetButtonState("DeleteBot", true, function () return { data.GetBotNameList()[gui.botConfigSelectedBotIndex] } end)
             ImGui.CloseCurrentPopup()
         end
         ImGui.SameLine()
