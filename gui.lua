@@ -1,37 +1,38 @@
-local mq                                         = require('mq')
-local imgui                                      = require('ImGui')
-local data                                       = require('data')
-local utils                                      = require('utils')
-local globalDashbar                              = require('globalDashbar')
+local mq                                   = require('mq')
+local imgui                                = require('ImGui')
+local data                                 = require('data')
+local utils                                = require('utils')
+local globalDashbar                        = require('globalDashbar')
 
 -- Screens
-local welcomeScreen                              = require('screens/welcomeScreen')
-local botManagementScreen                        = require('screens/botManagementScreen')
-local dashboardScreen                            = require('screens/dashboardScreen')
-local CreateBotScreen                            = require('screens/CreateBotScreen')
-local GroupManagementScreen                      = require('screens/GroupManagementScreen')
-local itemUpgradeWindow                          = require('screens/itemUpgradeWindow')
+local welcomeScreen                        = require('screens/welcomeScreen')
+local botManagementScreen                  = require('screens/botManagementScreen')
+local dashboardScreen                      = require('screens/dashboardScreen')
+local CreateBotScreen                      = require('screens/CreateBotScreen')
+local GroupManagementScreen                = require('screens/GroupManagementScreen')
+local itemUpgradeWindow                    = require('screens/itemUpgradeWindow')
+local settingsScreen                       = require('screens/settingsScreen')
 
 -- Subscreens
-local selectBotSubscreen                         = require('subscreens/selectBotSubscreen')
-local botConfigurationSubscreen                  = require('subscreens/botConfigurationSubscreen')
-local selectGroupSubscreen                       = require('subscreens/selectGroupSubscreen')
-local createGroupSubscreen                       = require('subscreens/createGroupSubscreen')
+local selectBotSubscreen                   = require('subscreens/selectBotSubscreen')
+local botConfigurationSubscreen            = require('subscreens/botConfigurationSubscreen')
+local selectGroupSubscreen                 = require('subscreens/selectGroupSubscreen')
+local createGroupSubscreen                 = require('subscreens/createGroupSubscreen')
 
-local buttonState = require('buttonState')
-local gui                                        = {}
+local buttonState                          = require('buttonState')
+local gui                                  = {}
 
-local openPuppeteer, showPuppeteer               = true, true
-local openGlobalDashbar, showGlobalDashbar       = false, true
-gui.botConfigSelectedBotIndex                    = 0
-gui.selectedGroupIndex                           = 0
-gui.selectedGroupName                            = nil
+local openPuppeteer, showPuppeteer         = true, true
+local openGlobalDashbar, showGlobalDashbar = true, true
+gui.botConfigSelectedBotIndex              = 0
+gui.selectedGroupIndex                     = 0
+gui.selectedGroupName                      = nil
 
-local FLT_MIN, FLT_MAX                           = mq.NumericLimits_Float()
+local FLT_MIN, FLT_MAX                     = mq.NumericLimits_Float()
 
-gui.windowSize                                   = ImVec2(512, 768)
+gui.windowSize                             = ImVec2(512, 768)
 
-gui.previousSubscreen                            = ''
+gui.previousSubscreen                      = ''
 
 
 gui.Screens = {
@@ -48,10 +49,10 @@ gui.Screens = {
     GroupManagement = {
         showGroupManagementScreen = false,
         drawFunction = function()
-            GroupManagementScreen
-                .drawGroupManagementScreen(gui)
+            GroupManagementScreen.drawGroupManagementScreen(gui)
         end
-    }
+    },
+    Settings = { showSettingsScreen = false, drawFunction = function() settingsScreen.drawSettingsScreen(gui) end }
 }
 gui.Subscreens = {
     SelectBot = {
@@ -98,7 +99,6 @@ function gui.DrawGlobalDashbarWindow()
         ImGui.End()
     end
 end
-
 
 function gui.ToggleWindowShow()
     openPuppeteer = not openPuppeteer
@@ -240,7 +240,7 @@ function gui.guiLoop()
             ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
             gui.ScreenManager()
         end
-      
+
         ImGui.End()
     end
     if doShowUpgradePopup then

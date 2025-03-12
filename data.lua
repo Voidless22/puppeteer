@@ -63,28 +63,57 @@ data.DefaultDashbarButtons = {
     }
 }
 
+data.PuppeteerSettings = {
+    AutoOpenDashbar = true
+}
+
+
 
 
 function data.AddToPotentialBotItemUpgrades(itemData)
     table.insert(data.potentialBotItemUpgrades, itemData)
 end
+
 function data.ClearPotentialBotItemUpgrades()
     data.potentialBotItemUpgrades = {}
 end
+
 function data.GetPotentialBotItemUpgrades()
     return data.potentialBotItemUpgrades
 end
 
+function data.loadPuppeteerSettings()
+    local configData, err = loadfile(mq.configDir .. '/puppeteer-settings-' .. mq.TLO.Me.Name() .. '.lua')
+    if err then
+        mq.pickle('puppeteer-settings-' .. mq.TLO.Me.Name() .. '.lua', data.PuppeteerSettings)
+    elseif configData then
+        -- File loaded, put content into your config table
+        data.PuppeteerSettings = configData()
+    end
+end
+
+function data.GetSettingValue(setting)
+    if setting then
+    return data.PuppeteerSettings[setting]
+    else
+    return data.PuppeteerSettings[setting]
+    end
+
+end
+function data.UpdateSettingValue(setting, value)
+    data.PuppeteerSettings[setting] = value
+    data.loadPuppeteerSettings()
+end
 
 
 function data.ResetGlobalDashbar()
     data.GlobalDashbarButtons = data.DefaultDashbarButtons
     mq.pickle('puppeteer-globalDashbar-' .. mq.TLO.Me.Name() .. '.lua', data.DefaultDashbarButtons)
 end
+
 function data.GetGlobalDashbarButtons()
     return data.GlobalDashbarButtons
 end
-
 
 function data.loadBotGroupConfigurations()
     local configData, err = loadfile(mq.configDir .. '/puppeteer-groups-' .. mq.TLO.Me.Name() .. '.lua')

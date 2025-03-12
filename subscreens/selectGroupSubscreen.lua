@@ -22,10 +22,38 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
 
     utils.CenterText("Select or Create a Group...")
 
-    ImGui.PushItemWidth(selectGroupComboWidth)
     utils.CenterItem()
-    gui.selectedGroupIndex = ImGui.ListBox("##GroupList", gui.selectedGroupIndex, data.GetGroupCompositionList(), nil, 25)
-    ImGui.PopItemWidth()
+    --   gui.selectedGroupIndex = ImGui.ListBox("##GroupList", gui.selectedGroupIndex, data.GetGroupCompositionList(), nil, 25)
+    if ImGui.BeginListBox("##GroupList") then
+        local groupList = data.GetGroupCompositionList()
+        for i, group in ipairs(groupList) do
+            local groupMembers = data.GetGroupComposition(group)
+
+            local tooltipText = '[Members]'
+            -- Add unique identifier for each selectable
+            if ImGui.Selectable(string.format("%s##%d", group, i), gui.selectedGroupIndex == i) then
+                gui.selectedGroupIndex = i
+            end
+
+            -- Tooltip logic — no selection required
+            if ImGui.IsItemHovered() then
+                for index, value in ipairs(groupMembers) do
+                    print(value)
+                    local botData = data.GetBotDataByName(value)
+                    if botData then
+                        tooltipText = string.format('%s\n[%i]: [%s] %s', tooltipText, index,
+                            botData.Class,
+                            value)
+                    end
+                end
+                ImGui.SetTooltip(tooltipText)
+            end
+        end
+        ImGui.EndListBox()
+    end
+
+
+
 
 
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))

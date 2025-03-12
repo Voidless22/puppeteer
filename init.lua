@@ -29,6 +29,7 @@ end
 
 
 initEvents()
+data.loadPuppeteerSettings()
 data.loadBotGroupConfigurations()
 data.loadPlayerGlobalDashbar()
 buttonState.InitDashbarButtons()
