@@ -14,8 +14,6 @@ buttonState.buttonStateData = {
 
 }
 
-
-
 function buttonState.GetButtonStateData(buttonName)
     if buttonName ~= nil then
         return buttonState.buttonStateData[buttonName]
@@ -66,29 +64,32 @@ end
 function buttonState.StateManager()
     for index, value in pairs(buttonState.GetButtonStateData()) do
         if value ~= nil and value.activated then
+            -- okay this is a toggle button
             if value.toggleState ~= nil then
+                -- is it off? let's call the negative callback, accounting for if an args table is supplied.
                 if value.toggleState == false and value.negativeCallback ~= nil then
                     if value.negativeArgs ~= nil then
                         value.negativeCallback(unpack(value.negativeArgs()))
                     else
                         value.negativeCallback()
                     end
-                   -- buttonState.FlipToggle(index)
+                    -- let's do the same for the positive callback
                 elseif value.toggleState == true and value.positiveCallback ~= nil then
                     if value.positiveArgs ~= nil then
                         value.positiveCallback(unpack(value.positiveArgs()))
                     else
                         value.positiveCallback()
                     end
-                  --  buttonState.FlipToggle(index)
                 end
             else
+                -- okay this isn't a toggle button, just call the callback with/without args
                 if value.args ~= nil then
                     value.callback(unpack(value.args()))
                 else
                     value.callback()
                 end
             end
+            -- all done here, clean up activated state
             buttonState.SetButtonState(index, false)
         end
     end
