@@ -4,7 +4,7 @@ local utils                 = require('utils')
 local data                  = require('data')
 local events                = require('events')
 local buttonState           = require('buttonState')
-local createGroupSubscreen = require('subscreens/createGroupSubscreen')
+local createGroupSubscreen  = require('subscreens/createGroupSubscreen')
 local selectGroupSubscreen  = {}
 
 local FLT_MIN, FLT_MAX      = mq.NumericLimits_Float()
@@ -15,8 +15,9 @@ local buttonSizeY           = 24
 local buttonWidth           = (selectGroupComboWidth / 2) - buttonPadding
 
 local showDeleteModal       = false
-
 function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
+    local includeSelftooltipTxt
+
     local startPoint = (ImGui.GetWindowSizeVec().x - selectGroupComboWidth) / 2
 
     ImGui.SetCursorPosY((ImGui.GetWindowSizeVec().y / 2) - 24 - ((26 * imgui.GetTextLineHeightWithSpacing()) / 2))
@@ -30,7 +31,7 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
         for i, group in ipairs(groupList) do
             local groupMembers = data.GetGroupComposition(group)
 
-            local tooltipText = '[Members]'
+            local tooltipText
             -- Add unique identifier for each selectable
             if ImGui.Selectable(string.format("%s##%d", group, i), gui.selectedGroupIndex == i) then
                 gui.selectedGroupIndex = i
@@ -42,12 +43,27 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
                     print(value)
                     local botData = data.GetBotDataByName(value)
                     if botData then
-                        tooltipText = string.format('%s\n[%i]: [%s] %s', tooltipText, index,
-                            botData.Class,
-                            value)
+                        if tooltipText then
+                            tooltipText = string.format('%s\n[%i]: [%s] %s', tooltipText, index,
+                                botData.Class,
+                                value)
+                        else
+                            tooltipText = string.format('[%i]: [%s] %s', index,
+                                botData.Class,
+                                value)
+                        end
+                    else
+                        includeSelftooltipTxt = string.format("[%i]: [%s] %s", index, mq.TLO.Me.Class(), mq.TLO.Me.Name())
                     end
                 end
-                ImGui.SetTooltip(tooltipText)
+                if ImGui.BeginItemTooltip() then
+                    ImGui.Text("[Members]\n")
+                    if includeSelftooltipTxt then
+                        ImGui.TextColored(ImGui.GetColorU32(0, 160, 0, 255), string.format(includeSelftooltipTxt))
+                    end
+                    ImGui.Text(tooltipText)
+                    ImGui.EndTooltip()
+                end
             end
         end
         ImGui.EndListBox()
