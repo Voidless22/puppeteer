@@ -17,6 +17,10 @@ local projectedGroup = {}
 local includeSelfInProjectedGrp = false
 local lastModifiedGroupIndex = nil
 
+function createGroupSubscreen.resetProjectedGroup()
+projectedGroup = {}
+end
+
 
 local function saveGroupData(gui, groupName, projectedGroup,noReturn)
     -- let's save it in our groups table

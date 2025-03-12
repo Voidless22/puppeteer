@@ -4,6 +4,7 @@ local utils                 = require('utils')
 local data                  = require('data')
 local events                = require('events')
 local buttonState           = require('buttonState')
+local createGroupSubscreen = require('subscreens/createGroupSubscreen')
 local selectGroupSubscreen  = {}
 
 local FLT_MIN, FLT_MAX      = mq.NumericLimits_Float()
@@ -59,6 +60,7 @@ function selectGroupSubscreen.drawSelectGroupSubscreen(gui)
     ImGui.SetCursorPosX(startPoint - (buttonPadding / 2))
     if ImGui.Button("Create a Group", ImVec2(buttonWidth, buttonSizeY)) then
         gui.clearGroupManagementSelections()
+        createGroupSubscreen.resetProjectedGroup()
         gui.previousSubscreen = "SelectGroup"
         gui.SetActiveSubscreen("CreateGroup")
     end
