@@ -55,7 +55,7 @@ local function generateName()
     shuffle(shuffled)
 
     local name = ""
-    local syllableCount = math.random(3, 6)
+    local syllableCount = math.random(2, 5)
     for i = 1, syllableCount do
         name = name .. shuffled[i]  -- Use shuffled list to avoid repeats
     end
