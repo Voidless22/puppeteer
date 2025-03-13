@@ -8,7 +8,6 @@ local itemUpgradeWindow = {}
 local openPossibleUpgrades, showPossibleUpgrades = false, true
 
 function itemUpgradeWindow.drawItemUpgradeWindow()
-
     local buttonWidth = 96
     local buttonSizeY = 48
     local wndSize = ImVec2(512, 512)
@@ -20,16 +19,23 @@ function itemUpgradeWindow.drawItemUpgradeWindow()
     openPossibleUpgrades, showPossibleUpgrades = ImGui.Begin("Possible Upgrades", openPossibleUpgrades,
         bit32.bor(ImGuiWindowFlags.NoResize))
     if showPossibleUpgrades then
+        local upgradeData = data.GetPotentialBotItemUpgrades()
+        local upgradeItem = mq.TLO.FindItem(upgradeData[1].upgradeItem)
         ImGui.SetWindowPos((viewport.Size / 2) - wndSize / 2, ImGuiCond.Once)
         ImGui.SetWindowSize(512, 512, ImGuiCond.Once)
-        utils.CenterText("Potential Gear Upgrades")
+        utils.CenterText("Potential Gear to Upgrade To")
+        --        utils.CenterItem()
+        ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (ImGui.CalcTextSizeVec(upgradeItem.Name()).x / 2))
+        if ImGui.Button(upgradeItem.Name() .. '##ugpradeItem') then
+            upgradeItem.Inspect()
+        end
         utils.BetterNewLine(10)
-        if imgui.BeginTable('##potentialUpgrades', 5, ImGuiTableFlags.Borders) then
-            imgui.TableSetupColumn('Bot')
-            imgui.TableSetupColumn('Slot')
-            imgui.TableSetupColumn('Current Item')
-            imgui.TableSetupColumn('Projected Item')
-            imgui.TableSetupColumn("Swap Item")
+        if imgui.BeginTable('##potentialUpgrades', 5, bit32.bor(ImGuiTableFlags.Borders, ImGuiTableFlags.Resizable)) then
+            imgui.TableSetupColumn('Bot',ImGuiTableColumnFlags.WidthAlwaysAutoResize)
+            imgui.TableSetupColumn('Slot',ImGuiTableColumnFlags.WidthAlwaysAutoResize)
+            imgui.TableSetupColumn('Current Item',ImGuiTableColumnFlags.WidthAlwaysAutoResize)
+            imgui.TableSetupColumn('Projected Item',ImGuiTableColumnFlags.WidthAlwaysAutoResize)
+            imgui.TableSetupColumn("Swap Item",ImGuiTableColumnFlags.WidthAlwaysAutoResize)
             imgui.TableSetupScrollFreeze(0, 1) -- Make row always visible
 
             -- Display data
@@ -42,26 +48,24 @@ function itemUpgradeWindow.drawItemUpgradeWindow()
                 imgui.TableNextColumn()
                 imgui.Text(value.itemSlot)
                 imgui.TableNextColumn()
-                if imgui.SmallButton('Inspect##Current' .. index) then
-                    local links = mq.ExtractLinks(value.line)
+                local links = mq.ExtractLinks(value.line)
+                if imgui.SmallButton(links[2].text .. '##Current' .. index) then
                     mq.ExecuteTextLink(links[2])
                 end
                 imgui.TableNextColumn()
-                if imgui.SmallButton('Inspect##Projected' .. index) then
-                    mq.TLO.FindItem(value.upgradeItem).Inspect()
-                    --end
+                if imgui.SmallButton("Stat Diff##" .. index) then
+
                 end
                 ImGui.TableNextColumn()
                 if ImGui.SmallButton('Swap##' .. index) then
                     if not mq.TLO.Cursor() then
                         local packSlot = mq.TLO.FindItem(value.upgradeItem).ItemSlot()
                         local subSlot = mq.TLO.FindItem(value.upgradeItem).ItemSlot2()
-                        mq.cmdf('/itemnotify in pack%i %i leftmouseup', (packSlot-22), (subSlot + 1))
+                        mq.cmdf('/itemnotify in pack%i %i leftmouseup', (packSlot - 22), (subSlot + 1))
                     end
                     mq.cmdf('/say ^ig byname %s', value.botName)
                     data.ClearPotentialBotItemUpgrades()
                     ImGui.CloseCurrentPopup()
-                    
                 end
             end
             imgui.EndTable()
@@ -76,8 +80,5 @@ function itemUpgradeWindow.drawItemUpgradeWindow()
         ImGui.End()
     end
 end
-
-
-
 
 return itemUpgradeWindow

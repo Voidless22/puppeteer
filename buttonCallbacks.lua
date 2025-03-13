@@ -1,6 +1,7 @@
 local mq = require('mq')
 local imgui = require('ImGui')
 local data = require('data')
+local gui = require
 local buttonCallbacks = {}
 
 
@@ -171,6 +172,21 @@ local function CheckBotUpgradesCallback()
         mq.cmd('/say ^iu')
     end
 end
+local function ToggleWindowShow()
+mq.cmd('/puppeteer')
+end
+
+local function EnableHoldBotsCallback()
+    mq.cmdf('/say ^hold spawned')
+
+end
+local function DisableHoldBotsCallback()
+    mq.cmdf('/say ^hold clear spawned')
+
+end
+
+
+
 
 buttonCallbacks.callbackRegistry.defaultCallback = EmptyCallback
 buttonCallbacks.callbackRegistry.SpawnedAtkCallback = SpawnedBotsAttackCallback
@@ -181,6 +197,8 @@ buttonCallbacks.callbackRegistry.EnableAutoDefendCallback = EnableAutoDefendCall
 buttonCallbacks.callbackRegistry.DisableAutoDefendCallback = DisableAutoDefendCallback
 buttonCallbacks.callbackRegistry.SummonBotsCallback = SummonBotsCallback
 buttonCallbacks.callbackRegistry.CheckBotUpgradesCallback = CheckBotUpgradesCallback
-
+buttonCallbacks.callbackRegistry.ToggleShowWindow = ToggleWindowShow
+buttonCallbacks.callbackRegistry.EnableHoldBotsCallback = EnableHoldBotsCallback
+buttonCallbacks.callbackRegistry.DisableHoldBotsCallback = DisableHoldBotsCallback
 
 return buttonCallbacks

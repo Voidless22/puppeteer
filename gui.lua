@@ -22,7 +22,7 @@ local createGroupSubscreen                 = require('subscreens/createGroupSubs
 local buttonState                          = require('buttonState')
 local gui                                  = {}
 
-local openPuppeteer, showPuppeteer         = true, true
+gui.openPuppeteer, gui.showPuppeteer         = false, false
 local openGlobalDashbar, showGlobalDashbar = true, true
 gui.botConfigSelectedBotIndex              = 0
 gui.selectedGroupIndex                     = 0
@@ -101,7 +101,7 @@ function gui.DrawGlobalDashbarWindow()
 end
 
 function gui.ToggleWindowShow()
-    openPuppeteer = not openPuppeteer
+    gui.openPuppeteer = not gui.openPuppeteer
 end
 
 function gui.GetActiveSubscreen()
@@ -233,11 +233,11 @@ function gui.guiLoop()
     local potentialUpgrades = data.GetPotentialBotItemUpgrades()
     local doShowUpgradePopup = #potentialUpgrades > 0
 
-    if openPuppeteer then -- Only try to render if the window should be shown
-        openPuppeteer, showPuppeteer = ImGui.Begin("Puppeteer", openPuppeteer)
+    if gui.openPuppeteer then -- Only try to render if the window should be shown
+        gui.openPuppeteer, gui.showPuppeteer = ImGui.Begin("Puppeteer", gui.openPuppeteer)
 
-        if showPuppeteer then
-            ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Always)
+        if gui.showPuppeteer then
+            ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.AppearingS)
             gui.ScreenManager()
         end
 

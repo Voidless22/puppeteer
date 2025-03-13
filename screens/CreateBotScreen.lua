@@ -23,7 +23,7 @@ local syllables = {
     "fal", 'fel','fa','fe','fu','fo','fi',
     "gar",'ga','gu','ge','go',
     "har", 'he','hu','ha','ho','hy',
-    "il", 'ia',' im','ie','iu','io','in','iz',
+    "il", 'ia','im','ie','iu','io','in','iz',
     "jor", 'ju', 'juu','ja','je','ji','jo',
     "kal",'ke','ka','ku','ki',
     "lor", 'la','le','lu','lo','ly','li',
@@ -43,16 +43,26 @@ local syllables = {
     "zor", 'zil', 'za'
 }
 
-local function generateName()
-    local name = ""
-    for i = 1, math.random(2, 5) do
-        name = name .. syllables[math.random(#syllables)]
+local function shuffle(tbl)
+    for i = #tbl, 2, -1 do
+        local j = math.random(i)
+        tbl[i], tbl[j] = tbl[j], tbl[i]
     end
-    name = name:sub(1, 1):upper() .. name:sub(2) 
-     -- Capitalize first letter
-     return name:gsub("%s+","")
 end
 
+local function generateName()
+    local shuffled = { unpack(syllables) }  -- Copy table to avoid modifying original
+    shuffle(shuffled)
+
+    local name = ""
+    local syllableCount = math.random(3, 6)
+    for i = 1, syllableCount do
+        name = name .. shuffled[i]  -- Use shuffled list to avoid repeats
+    end
+    
+    name = name:sub(1, 1):upper() .. name:sub(2)  -- Capitalize first letter
+    return name
+end
 
 local function drawRaceGrid()
     local drawlist = ImGui.GetWindowDrawList()

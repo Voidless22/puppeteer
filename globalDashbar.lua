@@ -11,7 +11,7 @@ local buttonTable        = data.GetGlobalDashbarButtons()
 local outerPaddingX      = 16
 local outerPaddingY      = 34
 local scrollPadBuffer    = 8
-local function drawButtonGrid()
+local function drawButtonGrid(gui)
     buttonTable = data.GetGlobalDashbarButtons()
     local drawlist = ImGui.GetWindowDrawList()
     local columnCount = math.floor((ImGui.GetWindowSizeVec().x - (buttonOuterPadding * 1.5)) /
@@ -46,9 +46,9 @@ local function drawButtonGrid()
         -- now we actually add the button
         if ImGui.Button(buttonLabel, ImVec2(minButtonSize, minButtonSize)) then
             if value.toggleState ~= nil then
-                buttonState.FlipToggle(index..'-DashbarBtn')
+                buttonState.FlipToggle(index .. '-DashbarBtn')
             end
-            buttonState.SetButtonState(index..'-DashbarBtn', true)
+            buttonState.SetButtonState(index .. '-DashbarBtn', true)
         end
 
 
@@ -85,7 +85,7 @@ local function drawButtonGrid()
     end
 end
 function globalDashbar.DrawGlobalDashbar(gui)
-    drawButtonGrid()
+    drawButtonGrid(gui)
 end
 
 return globalDashbar

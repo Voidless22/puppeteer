@@ -30,6 +30,15 @@ data.DefaultDashbarButtons = {
         tooltip = "releases all spawned bots and summons them to you."
     },
     [3] = {
+        Name = 'Hold',
+        activated = false,
+        positiveCallback = 'EnableHoldBotsCallback',
+        negativeCallback = 'DisableHoldBotsCallback',
+        args = nil,
+        tooltip = 'Tells all spawned bots to hold their attacks until otherwise told.',
+        toggleState = false
+    },
+    [4] = {
         Name = 'Guard Here',
         activated = false,
         positiveCallback = 'SetupCampCallback',
@@ -38,7 +47,7 @@ data.DefaultDashbarButtons = {
         tooltip = "Summons all spawned bots to your location, and puts them in guard mode.",
         toggleState = false
     },
-    [4] = {
+    [5] = {
         Name = 'Auto-Assist',
         activated = false,
         positiveCallback = 'EnableAutoDefendCallback',
@@ -47,20 +56,21 @@ data.DefaultDashbarButtons = {
         tooltip = 'This determines if bots will auto defend their owner.',
         toggleState = true
     },
-    [5] = {
+    [6] = {
         Name = 'Summon to Me',
         activated = false,
         callback = 'SummonBotsCallback',
         args = nil,
         tooltip = 'Summons all spawned bots to your location.'
     },
-    [6] = {
+    [7] = {
         Name = 'Upgrade?',
         activated = false,
         callback = 'CheckBotUpgradesCallback',
         args = nil,
         tooltip = 'Checks all spawned bots if the item held on cursor is an ugprade.'
-    }
+    },
+    
 }
 
 data.PuppeteerSettings = {
@@ -137,6 +147,13 @@ function data.loadPlayerGlobalDashbar()
         -- File loaded, put content into your config table
         data.GlobalDashbarButtons = configData()
     end
+    table.insert(data.GlobalDashbarButtons, 1, {
+        Name = 'Open Puppeteer',
+        activated = false,
+        callback = 'ToggleShowWindow',
+        args = nil,
+        tooltip = 'Open Puppeteer Window.'
+    })
 end
 
 
