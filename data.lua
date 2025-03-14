@@ -70,15 +70,41 @@ data.DefaultDashbarButtons = {
         args = nil,
         tooltip = 'Checks all spawned bots if the item held on cursor is an ugprade.'
     },
-    
+    [8] = {
+        Name = 'Switch Stance',
+        activated = false,
+        callback = 'OpenSwitchStanceScreen',
+        args = nil,
+        tooltip = 'Change the stance of a selected bot.'
+    },
+    [9] = {
+        Name = 'Toggle Taunt',
+        activated = false,
+        callback = 'OpenToggleTauntScreen',
+        tooltip = 'Enables/Disables Taunt for a selected bot'
+    }
+
 }
 
 data.PuppeteerSettings = {
     AutoOpenDashbar = true
 }
+data.ShouldOpenStanceSelect = false
 
+function data.GetShouldOpenStanceSelect()
+    return data.ShouldOpenStanceSelect
+end
 
+function data.SetShouldOpenStanceSelect(toggle)
+    data.ShouldOpenStanceSelect = toggle
+end
 
+function data.SetBotStanceData(bot, stance)
+    if data.CharacterBots[bot] ~= nil then
+        print('setting stance data')
+        data.CharacterBots[bot].Stance = { name = stance.name, id = stance.id }
+    end
+end
 
 function data.AddToPotentialBotItemUpgrades(itemData)
     table.insert(data.potentialBotItemUpgrades, itemData)
@@ -104,17 +130,16 @@ end
 
 function data.GetSettingValue(setting)
     if setting then
-    return data.PuppeteerSettings[setting]
+        return data.PuppeteerSettings[setting]
     else
-    return data.PuppeteerSettings[setting]
+        return data.PuppeteerSettings[setting]
     end
-
 end
+
 function data.UpdateSettingValue(setting, value)
     data.PuppeteerSettings[setting] = value
     data.loadPuppeteerSettings()
 end
-
 
 function data.ResetGlobalDashbar()
     data.GlobalDashbarButtons = data.DefaultDashbarButtons
@@ -155,7 +180,6 @@ function data.loadPlayerGlobalDashbar()
         tooltip = 'Open Puppeteer Window.'
     })
 end
-
 
 function data.initBotData(key, botData)
     if botData == nil then
@@ -244,6 +268,16 @@ end
 
 function data.GetBotNameList()
     return data.BotNameList
+end
+
+function data.GetSpawnedBotNameList()
+    local spawnedBots = {}
+    for index, value in ipairs(data.BotNameList) do
+        if mq.TLO.Spawn(value)() then
+            table.insert(spawnedBots, value)
+        end
+    end
+    return spawnedBots
 end
 
 function data.ClearBotList()

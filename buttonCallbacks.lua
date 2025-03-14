@@ -1,7 +1,6 @@
 local mq = require('mq')
 local imgui = require('ImGui')
 local data = require('data')
-local gui = require
 local buttonCallbacks = {}
 
 
@@ -185,6 +184,11 @@ local function DisableHoldBotsCallback()
 
 end
 
+local function OpenSwitchStanceScreen()
+    mq.cmd('/say ^stance current spawned')
+    data.SetShouldOpenStanceSelect(true)
+end
+
 
 
 
@@ -200,5 +204,5 @@ buttonCallbacks.callbackRegistry.CheckBotUpgradesCallback = CheckBotUpgradesCall
 buttonCallbacks.callbackRegistry.ToggleShowWindow = ToggleWindowShow
 buttonCallbacks.callbackRegistry.EnableHoldBotsCallback = EnableHoldBotsCallback
 buttonCallbacks.callbackRegistry.DisableHoldBotsCallback = DisableHoldBotsCallback
-
+buttonCallbacks.callbackRegistry.OpenSwitchStanceScreen = OpenSwitchStanceScreen
 return buttonCallbacks

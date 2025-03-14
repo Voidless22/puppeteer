@@ -12,6 +12,7 @@ local CreateBotScreen                      = require('screens/CreateBotScreen')
 local GroupManagementScreen                = require('screens/GroupManagementScreen')
 local itemUpgradeWindow                    = require('screens/itemUpgradeWindow')
 local settingsScreen                       = require('screens/settingsScreen')
+local stanceSelectWindow                   = require('screens/stanceSelectWindow')
 
 -- Subscreens
 local selectBotSubscreen                   = require('subscreens/selectBotSubscreen')
@@ -237,7 +238,7 @@ function gui.guiLoop()
         gui.openPuppeteer, gui.showPuppeteer = ImGui.Begin("Puppeteer", gui.openPuppeteer)
 
         if gui.showPuppeteer then
-            ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.AppearingS)
+            ImGui.SetWindowSize("Puppeteer", ImVec2(512, 768), ImGuiCond.Appearing)
             gui.ScreenManager()
         end
 
@@ -245,6 +246,9 @@ function gui.guiLoop()
     end
     if doShowUpgradePopup then
         itemUpgradeWindow.drawItemUpgradeWindow()
+    end
+    if data.GetShouldOpenStanceSelect() then
+        stanceSelectWindow.DrawStanceSelectWindow()
     end
 
     gui.DrawGlobalDashbarWindow()
