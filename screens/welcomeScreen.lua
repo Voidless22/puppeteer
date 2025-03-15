@@ -11,6 +11,7 @@ local welcomeButtons = {
     { text = 'Customize Bot Appearance', screen = 'CustomizeBot' },
     { text = 'Puppeteer Settings',       callback = function(gui) gui.SetActiveScreen("Settings") end },
     { text = "Open Global Dashbar",      callback = function(gui) gui.ToggleShowGlobalDashbar() end },
+    { text = 'Spell Dash',               callback = function(gui) gui.ToggleShowSpellDash() end }
 
 
 }

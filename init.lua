@@ -22,17 +22,21 @@ local function initEvents()
     mq.event("itemUpgradeMessage", "#1# says, 'I can use that for my #2# instead of my #3#! Would you like to #*#?'",
         events.ItemUpgradeMsgEvent, { keepLinks = true })
     mq.event("StanceInfo", "#1# says, 'My current stance is #2# (#3#).'", events.GetStanceInfo)
+    mq.event("GetSpellList", "Spell #*# #*# Spell: #*# (ID: #1#) #*# Add Spell: #*#", events.GetBotSpellList)
+    mq.event("GetSpellListBotname", "#1# has #*# AI Spells.", events.SpellEventBotName)
     mq.cmd('/say ^botlist')
     mq.delay(500)
     mq.doevents()
     mq.delay(100)
 end
 
-
 initEvents()
 data.loadPuppeteerSettings()
 data.loadBotGroupConfigurations()
 data.loadPlayerGlobalDashbar()
+data.RefreshBotSpells()
+data.loadPlayerSpellDash()
+
 buttonState.InitDashbarButtons()
 buttonState.ConnectDashbarCallbacks()
 mq.bind("/puppeteer", gui.ToggleWindowShow)

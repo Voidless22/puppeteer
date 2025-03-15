@@ -15,10 +15,10 @@ function events.getBotList(line, botIndex, botName, botLevel, botGender, botDeta
         Gender = botGender,
         Race = race,
         Class = class,
-        Stance = {name = ''},
+        Stance = { name = '' },
         Title = '',
         Surname = '',
-        Suffix = ''
+        Suffix = '',
     })
 end
 
@@ -32,8 +32,16 @@ function events.ItemUpgradeMsgEvent(line, name, itemSlot, currentBotItemLink)
             botDataIndex = index
         end
     end
-    data.AddToPotentialBotItemUpgrades({ botName = botName, upgradeItem = mq.TLO.Cursor.ID(), itemSlot = itemSlot, itemName = msgLinks[2].text, line = line })
+    data.AddToPotentialBotItemUpgrades({
+        botName = botName,
+        upgradeItem = mq.TLO.Cursor.ID(),
+        itemSlot = itemSlot,
+        itemName =
+            msgLinks[2].text,
+        line = line
+    })
 end
+
 function events.GetStanceInfo(line, name, stanceName, stanceID)
     local botDataIndex
     for index, value in ipairs(data.GetBotData()) do
@@ -42,8 +50,23 @@ function events.GetStanceInfo(line, name, stanceName, stanceID)
             botDataIndex = index
         end
     end
-    data.SetBotStanceData(botDataIndex, {name = stanceName, id = stanceID})
+    data.SetBotStanceData(botDataIndex, { name = stanceName, id = stanceID })
 end
 
+local tempSpells = {}
+function events.GetBotSpellList(line, spellID)
+    if utils.findMatchInTable(spellID, tempSpells) then
+        return
+    end
+
+    table.insert(tempSpells, spellID)
+
+    printf('Spell List Event: ID %s', spellID)
+end
+
+function events.SpellEventBotName(line, name)
+    data.SetBotSpells(name, tempSpells)
+    tempSpells = {}
+end
 
 return events

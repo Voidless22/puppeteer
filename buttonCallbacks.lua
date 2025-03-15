@@ -1,6 +1,7 @@
 local mq = require('mq')
 local imgui = require('ImGui')
 local data = require('data')
+
 local buttonCallbacks = {}
 
 
@@ -205,4 +206,5 @@ buttonCallbacks.callbackRegistry.ToggleShowWindow = ToggleWindowShow
 buttonCallbacks.callbackRegistry.EnableHoldBotsCallback = EnableHoldBotsCallback
 buttonCallbacks.callbackRegistry.DisableHoldBotsCallback = DisableHoldBotsCallback
 buttonCallbacks.callbackRegistry.OpenSwitchStanceScreen = OpenSwitchStanceScreen
+buttonCallbacks.callbackRegistry.RefreshBotSpells = data.RefreshBotSpells
 return buttonCallbacks

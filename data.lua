@@ -1,19 +1,15 @@
 local mq = require('mq')
-
-
+local utils = require('utils')
 local data = {}
 
 data.BotNameList = {}
 data.CharacterBots = {}
-
 data.Compositions = {
     Groups = {},
     Raids = {}
 }
-
 data.potentialBotItemUpgrades = {}
 data.GlobalDashbarButtons = {}
-
 data.DefaultDashbarButtons = {
     [1] = {
         Name = 'Attack',
@@ -82,15 +78,22 @@ data.DefaultDashbarButtons = {
         activated = false,
         callback = 'OpenToggleTauntScreen',
         tooltip = 'Enables/Disables Taunt for a selected bot'
+    },
+    [10] = {
+        Name = 'Refresh Bot Spells',
+        activated = false,
+        callback = 'RefreshBotSpells',
+        tooltip = 'Refreshes the spell lists for Spell Dash.'
     }
 
 }
-
 data.PuppeteerSettings = {
     AutoOpenDashbar = true
 }
 data.ShouldOpenStanceSelect = false
-
+data.Spells = {}
+data.SpellDashButtons = {}
+-- Bot Stances --
 function data.GetShouldOpenStanceSelect()
     return data.ShouldOpenStanceSelect
 end
@@ -106,6 +109,50 @@ function data.SetBotStanceData(bot, stance)
     end
 end
 
+-- Bot Spells --
+function data.SetBotSpells(name, spelltable)
+    data.CharacterBots[data.GetBotDataIndex(name)].Spells = spelltable
+    for index, value in ipairs(data.CharacterBots[data.GetBotDataIndex(name)].Spells) do
+        printf("[%s] Spell: [%s]", name, value)
+    end
+    table.insert(data.Spells, { Name = name, spellIDs = spelltable })
+end
+
+function data.GetSpellDashButtons()
+    return data.SpellDashButtons
+end
+
+function data.loadPlayerSpellDash()
+    local configData, err = loadfile(mq.configDir .. '/puppeteer-spellDash-' .. mq.TLO.Me.Name() .. '.lua')
+    if err then
+        -- Failed to read config file, create it using pickle
+        mq.pickle('puppeteer-spellDash-' .. mq.TLO.Me.Name() .. '.lua', data.SpellDashButtons)
+    elseif configData then
+        -- File loaded, put content into your config table
+        data.SpellDashButtons = configData()
+    end
+end
+function data.SavePlayerSpellDash(spellDash)
+    mq.pickle('puppeteer-spellDash-' .. mq.TLO.Me.Name() .. '.lua', spellDash)
+    data.SpellDashButtons = spellDash
+
+end
+
+function data.RefreshBotSpells()
+    local spawnedBots = data.GetSpawnedBotNameList()
+    for index, value in ipairs(spawnedBots) do
+            mq.cmdf('/target %s', value)
+            mq.cmdf('/say ^spells')
+            mq.delay(100)
+    end
+end
+
+
+function data.GetSpells()
+    return data.Spells
+end
+
+-- Item Upgrades
 function data.AddToPotentialBotItemUpgrades(itemData)
     table.insert(data.potentialBotItemUpgrades, itemData)
 end
@@ -118,6 +165,7 @@ function data.GetPotentialBotItemUpgrades()
     return data.potentialBotItemUpgrades
 end
 
+-- Settings --
 function data.loadPuppeteerSettings()
     local configData, err = loadfile(mq.configDir .. '/puppeteer-settings-' .. mq.TLO.Me.Name() .. '.lua')
     if err then
@@ -141,6 +189,7 @@ function data.UpdateSettingValue(setting, value)
     data.loadPuppeteerSettings()
 end
 
+-- Global Dashbar
 function data.ResetGlobalDashbar()
     data.GlobalDashbarButtons = data.DefaultDashbarButtons
     mq.pickle('puppeteer-globalDashbar-' .. mq.TLO.Me.Name() .. '.lua', data.DefaultDashbarButtons)
@@ -181,6 +230,7 @@ function data.loadPlayerGlobalDashbar()
     })
 end
 
+-- bot Data --
 function data.initBotData(key, botData)
     if botData == nil then
         printf("Nill bot data")
@@ -207,6 +257,14 @@ function data.GetBotDataByName(name)
         end
     end
     return false
+end
+
+function data.GetBotDataIndex(name)
+    for index, value in ipairs(data.CharacterBots) do
+        if value.Name == name then
+            return index
+        end
+    end
 end
 
 function data.GetBotTitle(index)

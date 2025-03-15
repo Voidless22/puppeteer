@@ -13,7 +13,7 @@ local GroupManagementScreen                = require('screens/GroupManagementScr
 local itemUpgradeWindow                    = require('screens/itemUpgradeWindow')
 local settingsScreen                       = require('screens/settingsScreen')
 local stanceSelectWindow                   = require('screens/stanceSelectWindow')
-
+local spellDashWindow                      = require('spellDash')
 -- Subscreens
 local selectBotSubscreen                   = require('subscreens/selectBotSubscreen')
 local botConfigurationSubscreen            = require('subscreens/botConfigurationSubscreen')
@@ -23,8 +23,9 @@ local createGroupSubscreen                 = require('subscreens/createGroupSubs
 local buttonState                          = require('buttonState')
 local gui                                  = {}
 
-gui.openPuppeteer, gui.showPuppeteer         = false, false
+gui.openPuppeteer, gui.showPuppeteer       = false, false
 local openGlobalDashbar, showGlobalDashbar = true, true
+local openSpellDash, showSpellDash         = true, true
 gui.botConfigSelectedBotIndex              = 0
 gui.selectedGroupIndex                     = 0
 gui.selectedGroupName                      = nil
@@ -89,6 +90,10 @@ end
 
 function gui.ToggleShowGlobalDashbar()
     openGlobalDashbar = not openGlobalDashbar
+end
+
+function gui.ToggleShowSpellDash()
+    openSpellDash = not openSpellDash
 end
 
 function gui.DrawGlobalDashbarWindow()
@@ -250,7 +255,13 @@ function gui.guiLoop()
     if data.GetShouldOpenStanceSelect() then
         stanceSelectWindow.DrawStanceSelectWindow()
     end
-
+    if openSpellDash then -- Only try to render if the window should be shown
+        openSpellDash, showSpellDash = ImGui.Begin("Spell Dash", openSpellDash)
+        if showSpellDash then
+            spellDashWindow.DrawSpellDash(gui)
+        end
+        ImGui.End()
+    end
     gui.DrawGlobalDashbarWindow()
 end
 

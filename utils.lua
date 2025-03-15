@@ -153,7 +153,7 @@ utils.EquipmentSlotTextures = {
 
 }
 
- function utils.getMaxButtonTextSize(textTable)
+function utils.getMaxButtonTextSize(textTable)
     local maxTextSize = 0
     for index, value in pairs(textTable) do
         if ImGui.CalcTextSize(value) > maxTextSize then
@@ -162,7 +162,6 @@ utils.EquipmentSlotTextures = {
     end
     return maxTextSize + 6
 end
-
 
 function utils.IsValidRaceClassCombo(race, class)
     if race == '' then return false end
@@ -183,7 +182,6 @@ function utils.findMatchInTable(line, table)
     return nil
 end
 
-
 function utils.CenterText(line, ...)
     local formattedLine = string.format(line, ...)
     local lastCursorPos = ImGui.GetCursorPosVec()
@@ -195,17 +193,56 @@ end
 
 function utils.CenterItem(width)
     if width == nil then
-    ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (ImGui.CalcItemWidth() / 2))
-else
-    ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (width / 2))
-
+        ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (ImGui.CalcItemWidth() / 2))
+    else
+        ImGui.SetCursorPosX((ImGui.GetWindowSizeVec().x / 2) - (width / 2))
+    end
 end
 
-
-end
 function utils.BetterNewLine(spacing)
     ImGui.SetCursorPosY(ImGui.GetCursorPosY() + spacing)
+end
 
+function utils.GatherSpellInfo(spells)
+    local spellInfoTable = {}
+    for index, value in ipairs(spells) do
+        for i, v in ipairs(value.spellIDs) do
+            local spellName = string.format('%s (%s)', mq.TLO.Spell(v).Name(), value.Name)
+            local spellCategory = mq.TLO.Spell(v).Category()
+            local spellSubcategory = mq.TLO.Spell(v).Subcategory()
+            local spellLevel = mq.TLO.Spell(v).Level()
+            local spellTargetType = mq.TLO.Spell(v).TargetType()
+            table.insert(spellInfoTable,
+                {
+                    Name = spellName,
+                    Category = spellCategory,
+                    SpellSubcategory = spellSubcategory,
+                    SpellLevel =
+                        spellLevel,
+                    SpellTargetType = spellTargetType
+                })
+        end
+    end
+    return spellInfoTable
+end
+
+function utils.GetSpellInfo(botName, spellID)
+    local spellInfoTable = {}
+    local spellName = string.format('%s (%s)', mq.TLO.Spell(spellID).Name(), botName)
+    local spellCategory = mq.TLO.Spell(spellID).Category()
+    local spellSubcategory = mq.TLO.Spell(spellID).Subcategory()
+    local spellLevel = mq.TLO.Spell(spellID).Level()
+    local spellTargetType = mq.TLO.Spell(spellID).TargetType()
+   spellInfoTable =
+        {
+            Name = spellName,
+            Category = spellCategory,
+            SpellSubcategory = spellSubcategory,
+            SpellLevel =
+                spellLevel,
+            SpellTargetType = spellTargetType
+        }
+    return spellInfoTable
 end
 
 return utils
