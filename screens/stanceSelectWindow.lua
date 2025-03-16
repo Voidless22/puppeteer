@@ -9,10 +9,10 @@ local stanceOptions      = {
     [1] = 'Passive',
     [2] = 'Balanced',
     [3] = 'Efficient',
-    [4] = 'Aggressive',
-    [5] = 'Assist',
-    [6] = 'Burn',
-    [7] = 'AE Burn'
+    [4] = 'Aggressive', -- + 1 (5)
+    [5] = 'Assist', -- + 1 (6)
+    [6] = 'Burn', -- + 1 (7)
+    [7] = 'AE Burn' -- + 2 (9)
 }
 local stanceDescriptions = {
     [1] = 'Idle. Does not Cast or engage in combat.',
@@ -63,9 +63,12 @@ function stanceSelectWindow.DrawStanceSelectWindow()
         end
         utils.CenterItem(100)
         if ImGui.Button("Save##stancewnd", ImVec2(48, 24)) then
-            local stanceID = stanceSelectWindow.projectedStance
-            if stanceID == 4 or stanceID == 5 then
+            local stanceID = stanceSelectWindow.projectedStance 
+            if stanceSelectWindow.projectedStance  >= 4 and stanceSelectWindow.projectedStance  < 7 then
                 stanceID = stanceID + 1
+            end
+            if stanceSelectWindow.projectedStance  == 7 then
+                stanceID = stanceID + 2
             end
             mq.cmdf('/say ^stance %i byname %s', stanceID, spawnedBotList[stanceSelectWindow.selectedBot])
             data.SetShouldOpenStanceSelect(false)

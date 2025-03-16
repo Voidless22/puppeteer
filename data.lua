@@ -139,11 +139,12 @@ function data.SavePlayerSpellDash(spellDash)
 end
 
 function data.RefreshBotSpells()
+    data.Spells = {}
     local spawnedBots = data.GetSpawnedBotNameList()
     for index, value in ipairs(spawnedBots) do
             mq.cmdf('/target %s', value)
             mq.cmdf('/say ^spells')
-            mq.delay(100)
+            mq.delay(250)
     end
 end
 
